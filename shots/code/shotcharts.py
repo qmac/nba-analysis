@@ -84,17 +84,18 @@ def show_comparison(predicted, actual):
     sns.set_style("white")
     sns.set_color_codes()
     f, (predicted, actual) = plt.subplots(ncols=2, sharey=True)
+    f.text(0.5,0.975,'Naive Bayes Make/Miss Shot Classification \n(showing results of classifying ~25% of Stephen Curry\'s shots from the 2014-2015 season)',horizontalalignment='center',
+       verticalalignment='top')
     draw_court(ax=predicted, outer_lines=True)
     draw_court(ax=actual, outer_lines=True)
 
-    # Plot predictioned and actual side by side
+    # Plot predicted and actual side by side
     predicted.scatter(predicted_makes.x, predicted_makes.y, color='g')
     predicted.scatter(predicted_misses.x, predicted_misses.y, color='r')
+    predicted.set_title('Predicted Shot Chart')
     actual.scatter(actual_makes.x, actual_makes.y, color='g')
     actual.scatter(actual_misses.x, actual_misses.y, color='r')
+    actual.set_title('Actual Shot Chart')
     plt.xlim(-300,300)
     plt.ylim(-100,500)
     plt.show()
-
-df = pd.DataFrame.from_csv('./../data/hb40_shots.csv')
-show_comparison(df, df)
