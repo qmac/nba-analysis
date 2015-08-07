@@ -33,3 +33,9 @@ Libraries
 * [Seaborn] (http://stanford.edu/~mwaskom/software/seaborn/)
 
 All of these can be installed using `pip install`
+
+
+Disclaimer
+-------------------
+
+All of these experiments/mini-projects are more for proof-of-concept and practice than true analysis. Most of the data sets could use significant refinement. Moreover the analysis is rudimentary and the scikit-learn algorithms used could be tuned much further by manipulating parameters.
