@@ -5,6 +5,44 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
+
+def plot_inertias(cluster_data):
+	# Elbow Method for determining k
+	inertias = []
+	for k in range(2, 100):
+		clstr = KMeans(n_clusters=k, random_state=42)
+		clstr.fit(cluster_data)
+		inertias.append(clstr.inertia_)
+
+	plt.figure(0)
+	plt.plot(inertias)
+	plt.savefig('./../figures/inertias.png')
+
+def plot_silhouettes(cluster_data):
+	# Silhouette Method for determining k 
+	silhouettes = []
+	for k in range(2, 100):
+		clstr = KMeans(n_clusters=k, random_state=42)
+		cluster_labels = clstr.fit_predict(cluster_data)
+		silhouette = silhouette_score(cluster_data, cluster_labels)
+		silhouettes.append(silhouette)
+
+	plt.figure(1)
+	plt.plot(silhouettes)
+	plt.savefig('./../figures/silhouettes.png')
+
+def cluster(cluster_data):
+	clstr = KMeans(n_clusters=11)
+	clstr.fit(fitting_data)
+
+	df['tier'] = clstr.labels_
+
+	results = df[['Player', 'tier']]
+	print results['tier'].value_counts()
+
+	results.to_csv('./../data/results.csv')
+
 # Load data from CSV
 df = pd.DataFrame.from_csv('./../data/leagues_NBA_2015_advanced.csv')
 
@@ -20,36 +58,4 @@ feature_columns = [
 				]
 
 fitting_data = df[feature_columns]
-
-# Elbow Method for determining k
-inertias = []
-for k in range(2, 100):
-	clstr = KMeans(n_clusters=k, random_state=42)
-	clstr.fit(fitting_data)
-	inertias.append(clstr.inertia_)
-
-plt.plot(inertias)
-plt.savefig('./../figures/inertias.png')
-
-# Silhouette Method for determining k 
-silhouettes = []
-for k in range(2, 100):
-	clstr = KMeans(n_clusters=k, random_state=42)
-	cluster_labels = clstr.fit_predict(fitting_data)
-	silhouette = silhouette_score(fitting_data, cluster_labels)
-	silhouettes.append(silhouette)
-
-plt.plot(silhouettes)
-plt.savefig('./../figures/silhouettes.png')
-
-'''
-clstr = KMeans(n_clusters=11) # Using rule of thumb (k=sqrt(n/2))
-clstr.fit(fitting_data)
-
-df['tier'] = clstr.labels_
-
-results = df[['Player', 'tier']]
-print results['tier'].value_counts()
-
-results.to_csv('results.csv')
-'''
+cluster(fitting_data)
