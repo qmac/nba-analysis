@@ -5,10 +5,12 @@ SIZE = 2000
 players = []
 result = {}
 CSV.foreach('results.csv') do |row|
-  players << {
-    :name => row[1],
-    :tier => row[2].to_i
-  }
+  unless($. == 1)
+    players << {
+      :name => row[1],
+      :tier => row[2].to_i
+    }
+  end
 end
 
 players_grouped = players.group_by { |p| p[:tier] }
