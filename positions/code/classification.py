@@ -27,12 +27,12 @@ years = ['2004-2005', '2005-2006', '2006-2007', '2007-2008', '2008-2009', '2009-
 
 
 for i in range(len(prediction_probabilities)):
-	labels = ['C', 'PF', 'PG', 'SF', 'SG']
-	values = prediction_probabilities[i]
-	optimum = [1.0, 1.0, 1.0, 1.0, 1.0]
+    labels = ['C', 'PF', 'PG', 'SF', 'SG']
+    values = prediction_probabilities[i]
+    optimum = [1.0, 1.0, 1.0, 1.0, 1.0]
 
-	radar_graph(labels, values, optimum)
+    radar_graph(labels, values, optimum)
 
-	plt.suptitle('Manu Ginobili %s' % (years[i]))
-	plt.savefig('./../figures/manu_ginobili_%s' % (years[i]))
-	plt.show()
+    plt.suptitle('Manu Ginobili %s' % (years[i]))
+    plt.savefig('./../figures/manu_ginobili_%s' % (years[i]))
+    plt.show()

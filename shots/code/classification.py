@@ -7,15 +7,15 @@ import shotcharts as charts
 df = pd.DataFrame.from_csv('./../data/steph_shots.csv')
 
 feature_columns = ['period', 
-				'minutes_remaining', 
-				'shot_distance', 
-				'x', 
-				'y', 
-				'dribbles', 
-				'touch_time', 
-				'defender_distance', 
-				'shot_clock'
-				]
+                'minutes_remaining', 
+                'shot_distance', 
+                'x', 
+                'y', 
+                'dribbles', 
+                'touch_time', 
+                'defender_distance', 
+                'shot_clock'
+                ]
 
 classifier = GaussianNB()
 training_proportion = 0.75

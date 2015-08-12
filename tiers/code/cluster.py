@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
 
+# Elbow Method for determining k
 def plot_inertias(cluster_data):
-	# Elbow Method for determining k
 	inertias = []
 	for k in range(2, 100):
 		clstr = KMeans(n_clusters=k, random_state=42)
@@ -19,8 +19,8 @@ def plot_inertias(cluster_data):
 	plt.plot(inertias)
 	plt.savefig('./../figures/inertias.png')
 
+# Silhouette Method for determining k 
 def plot_silhouettes(cluster_data):
-	# Silhouette Method for determining k 
 	silhouettes = []
 	for k in range(2, 100):
 		clstr = KMeans(n_clusters=k, random_state=42)
