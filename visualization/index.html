@@ -2,9 +2,9 @@
 <meta charset="utf-8">
 <style>
 
-image {
+/*image {
   overflow: visible !important;
-}
+}*/
 .node {
   cursor: pointer;
 }
@@ -61,12 +61,12 @@ d3.json("nba.json", function(error, root) {
       nodes = pack.nodes(root),
       view;
 
-  // var circle = svg.selectAll("circle")
-  //     .data(nodes)
-  //   .enter().append("circle")
-  //     .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
-  //     .style("fill", function(d) { return d.children ? color(d.depth) : null; })
-  //     .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
+  var circle = svg.selectAll("circle")
+      .data(nodes)
+    .enter().append("circle")
+      .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+      .style("fill", function(d) { return d.children ? color(d.depth) : null; })
+      .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
 
 
   var image = svg
@@ -82,6 +82,8 @@ d3.json("nba.json", function(error, root) {
               )
               .attr('width', '50')
               .attr('height', '50')
+              .attr('preserveAspectRatio', 'xMinYMin meet')
+              .attr('viewBox', '0 0 50 50')
               .style('display', function(d) { return d.children ? 'none' : 'inline'; });
 
   // var text = svg.selectAll("text")
@@ -93,7 +95,8 @@ d3.json("nba.json", function(error, root) {
   //     .attr("class", function(d) { return d.parent ? d.children ? "label nnode" : "label nnode nnode--leaf" : "label nnode nnode--root"; })
   //     .text(function(d) { return d.name; });
 
-  var node = svg.selectAll("circle,text,image");
+  var node = svg.selectAll("circle,text");
+  var imgs = svg.selectAll('image');
 
   d3.select("body")
       .style("background", color(-1))
@@ -120,7 +123,19 @@ d3.json("nba.json", function(error, root) {
 
   function zoomTo(v) {
     var k = diameter / v[2]; view = v;
-    node.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
+    node.attr("transform", function(d) {
+      return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; 
+    });
+    imgs.attr("transform", function(d) {
+      var x = d.x;
+      var y = d.y;
+      if(!d.children) {
+        //debugger;
+        x = d.x - 25;
+        y  = d.y - 25
+      }
+      return "translate(" + (x - v[0]) * k + "," + (y - v[1]) * k + ")"; 
+    });
     circle.attr("r", function(d) { return d.r * k; });
   }
 });
