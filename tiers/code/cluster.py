@@ -40,8 +40,6 @@ def cluster(cluster_data):
 
     df['tier'] = clstr.labels_
     results = df[['Player', 'tier']]
-
-    results.to_csv('./../visualization/results.csv')
     return results
 
 # Load data from CSV

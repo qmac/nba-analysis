@@ -1,4 +1,5 @@
 import os
+import json
 
 import pandas as pd
 import numpy as np
@@ -27,9 +28,15 @@ def scrape_pictures(player_clusters):
         image = urllib2.urlopen(url)
         data = image.read()
 
-        file = open('%s%s.png' % (directory, player), 'w+')
-        file.write(data)
-        file.close()
+        with open('%s%s.png' % (directory, url_name), 'w+') as outfile:
+            outfile.write(data)
 
+SIZE = 2000
 def clusters_to_json(player_clusters):
-    return
+    players_dict = {}
+    players_grouped = player_clusters.groupby('tier')
+    players_dict['name'] = 'vis'
+    players_dict['children'] = map(lambda x:{'name':'Tier %d' % (x[0]), 'children':map(lambda x:{'name':x, 'size':2000}, x[1]['Player'])}, players_grouped)
+
+    with open('./../visualization/nba_clusters.json', 'w+') as outfile:
+        json.dump(players_dict, outfile)
