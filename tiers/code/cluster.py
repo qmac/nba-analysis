@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+import visualization
+
 DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
 
 # Elbow Method for determining k
@@ -37,11 +39,8 @@ def cluster(cluster_data):
     clstr.fit(fitting_data)
 
     df['tier'] = clstr.labels_
-
     results = df[['Player', 'tier']]
-    print results['tier'].value_counts()
-
-    results.to_csv('./../data/results.csv')
+    return results
 
 # Load data from CSV
 df = pd.DataFrame.from_csv('./../data/leagues_NBA_2015_advanced.csv')
@@ -58,4 +57,8 @@ feature_columns = [
                 ]
 
 fitting_data = df[feature_columns]
-cluster(fitting_data)
+clustered_players = cluster(fitting_data)
+
+# Set up for visualization
+visualization.scrape_pictures(clustered_players)
+visualization.clusters_to_json(clustered_players)
