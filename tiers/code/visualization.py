@@ -36,7 +36,7 @@ def clusters_to_json(player_clusters):
     players_dict = {}
     players_grouped = player_clusters.groupby('tier')
     players_dict['name'] = 'vis'
-    players_dict['children'] = map(lambda x:{'name':'Tier %d' % (x[0]), 'children':map(lambda x:{'name':x, 'size':2000}, x[1]['Player'])}, players_grouped)
+    players_dict['children'] = map(lambda x:{'name':'Tier %d' % (x[0]), 'children':map(lambda x:{'name':x, 'size':SIZE}, x[1]['Player'])}, players_grouped)
 
     with open('./../visualization/nba_clusters.json', 'w+') as outfile:
         json.dump(players_dict, outfile)
