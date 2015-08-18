@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
 
 import pandas as pd
@@ -43,6 +44,17 @@ def cluster(cluster_data):
 
     results.to_csv('./../data/results.csv')
 
+def cluster_agg(cluster_data):
+    clstr = AgglomerativeClustering(n_clusters=11, linkage='ward')
+    clstr.fit(fitting_data)
+
+    df['tier'] = clstr.labels_
+
+    results = df[['Player', 'tier']]
+    print results['tier'].value_counts()
+
+    results.to_csv('agg_results.csv')
+
 # Load data from CSV
 df = pd.DataFrame.from_csv('./../data/leagues_NBA_2015_advanced.csv')
 
@@ -59,3 +71,4 @@ feature_columns = [
 
 fitting_data = df[feature_columns]
 cluster(fitting_data)
+cluster_agg(fitting_data)
