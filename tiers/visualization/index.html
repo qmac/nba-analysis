@@ -36,7 +36,7 @@
 <script>
 
 var margin = 10,
-    diameter = 1200;
+    diameter = 600;
 
 var color = d3.scale.linear()
     .domain([-1, 5])
@@ -74,6 +74,9 @@ d3.json("nba_clusters.json", function(error, root) {
               .append('svg:image')
               .attr('xlink:href', 
                 function(d) {
+                  if(d.name.indexOf("Tier") > -1 || d.name === 'vis') {
+                    return;
+                  }
                   if(d.name === 'Nene Hilario') {
                     return '/pics/nene.png';
                   }
@@ -87,16 +90,16 @@ d3.json("nba_clusters.json", function(error, root) {
               .attr('height', '50')
               .attr('preserveAspectRatio', 'xMinYMin meet')
               .attr('viewBox', '0 0 50 50')
-              .style('display', function(d) { return d.children ? 'none' : 'inline'; });
+              .style('display', function(d) { return d.children ? 'inline' : 'none'; });
 
-  // var text = svg.selectAll("text")
-  //     .data(nodes)
-  //   .enter().append("text")
-  //     //.attr("class", "label")
-  //     //.style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
-  //     //.style("display", function(d) { return d.parent === root ? null : "none"; })
-  //     .attr("class", function(d) { return d.parent ? d.children ? "label nnode" : "label nnode nnode--leaf" : "label nnode nnode--root"; })
-  //     .text(function(d) { return d.name; });
+  var text = svg.selectAll("text")
+      .data(nodes)
+    .enter().append("text")
+      .attr("class", "label")
+      .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
+      .style("display", function(d) { return d.parent === root ? null : "none"; })
+      .attr("class", function(d) { return d.parent ? d.children ? "label nnode" : "label nnode nnode--leaf" : "label nnode nnode--root"; })
+      .text(function(d) { return d.name; });
 
   var node = svg.selectAll("circle,text");
   var imgs = svg.selectAll('image');
@@ -118,6 +121,12 @@ d3.json("nba_clusters.json", function(error, root) {
         });
 
     transition.selectAll("text")
+      .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
+        .style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
+        .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
+        .each("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
+
+    transition.selectAll("image")
       .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
         .style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
         .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
