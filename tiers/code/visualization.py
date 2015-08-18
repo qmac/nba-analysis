@@ -19,6 +19,8 @@ def scrape_pictures(player_clusters):
         # Stupid edge cases
         if player == 'Nene Hilario':
             player = 'Nene'
+        if player == 'Tim Hardaway':
+            player = 'Tim Hardaway Jr'
 
         url_name = player.lower().replace(' ', '_').replace('.', '').replace('\'', '')
         print url_name

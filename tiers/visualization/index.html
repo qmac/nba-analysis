@@ -77,6 +77,9 @@ d3.json("nba_clusters.json", function(error, root) {
                   if(d.name === 'Nene Hilario') {
                     return '/pics/nene.png';
                   }
+                  if(d.name === 'Tim Hardaway') {
+                    return '/pics/tim_hardaway_jr.png';
+                  }
                   return '/pics/' + d.name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '').replace('\'', '') + '.png'; 
                 }
               )
