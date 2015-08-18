@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
 
 import pandas as pd
@@ -36,7 +37,15 @@ def plot_silhouettes(cluster_data):
 
 def cluster(cluster_data):
     clstr = KMeans(n_clusters=11)
-    clstr.fit(fitting_data)
+    clstr.fit(cluster_data)
+
+    df['tier'] = clstr.labels_
+    results = df[['Player', 'tier']]
+    return results
+
+def cluster_agg(cluster_data):
+    clstr = AgglomerativeClustering(n_clusters=11, linkage='ward')
+    clstr.fit(cluster_data)
 
     df['tier'] = clstr.labels_
     results = df[['Player', 'tier']]
