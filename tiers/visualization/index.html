@@ -58,6 +58,12 @@ d3.json("nba_clusters.json", function(error, root) {
       nodes = pack.nodes(root),
       view;
 
+  var clip = svg.append("svg:clipPath")
+    .attr("id", "clip");
+
+  clip.append("circle")
+    .attr("r", "50");
+
   var circle = svg.selectAll("circle")
       .data(nodes)
     .enter().append("circle")
@@ -88,6 +94,7 @@ d3.json("nba_clusters.json", function(error, root) {
     .attr('height', '50')
     .attr('preserveAspectRatio', 'xMinYMin meet')
     .attr('viewBox', '0 0 50 50')
+    .attr('clip-path', 'url(#clip)')
     .style('display', function(d) { return d.parent === root ? null : 'none'; });
 
   var text = svg.selectAll("text")
