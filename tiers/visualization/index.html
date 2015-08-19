@@ -32,6 +32,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script>
 
+var encodedName = function(player_name) {
+  if(player_name.indexOf("Tier") > -1 || player_name === 'vis') {
+    return;
+  }
+  if(player_name === 'Nene Hilario') {
+    return 'nene';
+  }
+  if(player_name === 'Tim Hardaway') {
+    return 'tim_hardaway_jr';
+  }
+  return player_name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '').replace('\'', ''); 
+}
+
+var filePath = function(player_name) {
+  return '/pics/' + encodedName(player_name) + '.png';
+}
 var margin = 10,
     diameter = 600;
 
@@ -61,29 +77,16 @@ d3.json("nba_clusters.json", function(error, root) {
   var image = svg.append('defs').selectAll('filter')
     .data(nodes)
   .enter().append('filter')
-  .attr('id', function(d) { return d.name.toLowerCase().replace(/\s/g, '_'); })
+  .attr('id', function(d) { return encodedName(d.name); })
   .append('feImage')
-  .attr('xlink:href', 
-    function(d) {
-      if(d.name.indexOf("Tier") > -1 || d.name === 'vis') {
-        return;
-      }
-      if(d.name === 'Nene Hilario') {
-        return '/pics/nene.png';
-      }
-      if(d.name === 'Tim Hardaway') {
-        return '/pics/tim_hardaway_jr.png';
-      }
-      return '/pics/' + d.name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '').replace('\'', '') + '.png'; 
-    }
-  )
+  .attr('xlink:href', function(d) { return filePath(d.name) })
 
   var circle = svg.selectAll("circle")
       .data(nodes)
     .enter().append("circle")
       .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
       .attr('filter', function(d) {
-        return d.size === 2000 ? "url(#" + d.name.toLowerCase().replace(/\s/g, '_') + ")" : null; 
+        return d.size === 2000 ? "url(#" + encodedName(d.name) + ")" : null; 
       })
       .style("fill", function(d) { return d.children ? color(d.depth) : null; })
       .style('display', function(d) { return d.parent === root ? null : 'none'; })
@@ -98,8 +101,9 @@ d3.json("nba_clusters.json", function(error, root) {
       .attr("class", function(d) { return d.parent ? d.children ? "label nnode" : "label nnode nnode--leaf" : "label nnode nnode--root"; })
       .text(function(d) { return d.name; });
 
-  var node = svg.selectAll("circle,text");
+  var node = svg.selectAll("circle");
   var imgs = svg.selectAll('image');
+  var textNodes = svg.selectAll('text');
 
   d3.select("body")
       .style("background", color(-1))
@@ -119,7 +123,8 @@ d3.json("nba_clusters.json", function(error, root) {
 
     transition.selectAll("circle")
       .filter(function(d) { return d.parent === focus || this.style.display === "inline"; })
-        .style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
+        //.style("fill-opacity", function(d) { return d.parent === focus ? 1 : 0; })
+        .style("fill-opacity", function(d) { return 1; })
         .each("start", function(d) { if (d.parent === focus) this.style.display = "inline"; })
         .each("end", function(d) { if (d.parent !== focus) this.style.display = "none"; });
 
@@ -140,6 +145,9 @@ d3.json("nba_clusters.json", function(error, root) {
     var k = diameter / v[2]; view = v;
     node.attr("transform", function(d) {
       return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; 
+    });
+    textNodes.attr("transform", function(d) {
+      return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1] + 6) * k + ")"; 
     });
     imgs.attr("transform", function(d) {
       var x = d.x;
