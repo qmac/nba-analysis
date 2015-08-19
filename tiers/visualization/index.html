@@ -82,7 +82,9 @@ d3.json("nba_clusters.json", function(error, root) {
       .data(nodes)
     .enter().append("circle")
       .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
-      .attr('filter', function(d) { return "url(#" + d.name.toLowerCase().replace(/\s/g, '_') + ")"; })
+      .attr('filter', function(d) {
+        return d.size === 2000 ? "url(#" + d.name.toLowerCase().replace(/\s/g, '_') + ")" : null; 
+      })
       .style("fill", function(d) { return d.children ? color(d.depth) : null; })
       .style('display', function(d) { return d.parent === root ? null : 'none'; })
       .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
