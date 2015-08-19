@@ -8,11 +8,11 @@
 <svg width="700" height="600">
 <g>
 <defs>
-  <pattern id="img1" patternUnits="userSpaceOnUse" width="100" height="100">
-    <image xlink:href="/pics/john_wall.png" x="0" y="0" width="100" height="100" />
-  </pattern>
+  <filter id="img1">
+    <feImage xlink:href="/pics/john_wall.png"/>
+  </filter>
 </defs>
-<circle cx="180" cy="120" r="80" fill="url(#img1)"/>
+<circle cx="180" cy="120" r="50" filter="url(#img1)" stroke="black"/>
 </g>
 </svg>
 </body>
