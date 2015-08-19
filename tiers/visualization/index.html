@@ -58,44 +58,34 @@ d3.json("nba_clusters.json", function(error, root) {
       nodes = pack.nodes(root),
       view;
 
-  var clip = svg.append("svg:clipPath")
-    .attr("id", "clip");
-
-  clip.append("circle")
-    .attr("r", "50");
+  var image = svg.append('defs').selectAll('filter')
+    .data(nodes)
+  .enter().append('filter')
+  .attr('id', function(d) { return d.name.toLowerCase().replace(/\s/g, '_'); })
+  .append('feImage')
+  .attr('xlink:href', 
+    function(d) {
+      if(d.name.indexOf("Tier") > -1 || d.name === 'vis') {
+        return;
+      }
+      if(d.name === 'Nene Hilario') {
+        return '/pics/nene.png';
+      }
+      if(d.name === 'Tim Hardaway') {
+        return '/pics/tim_hardaway_jr.png';
+      }
+      return '/pics/' + d.name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '').replace('\'', '') + '.png'; 
+    }
+  )
 
   var circle = svg.selectAll("circle")
       .data(nodes)
     .enter().append("circle")
       .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+      .attr('filter', function(d) { return "url(#" + d.name.toLowerCase().replace(/\s/g, '_') + ")"; })
       .style("fill", function(d) { return d.children ? color(d.depth) : null; })
       .style('display', function(d) { return d.parent === root ? null : 'none'; })
       .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
-
-
-  var image = svg.selectAll('image')
-      .data(nodes)
-    .enter().append('svg:image')
-    .attr('xlink:href', 
-      function(d) {
-        if(d.name.indexOf("Tier") > -1 || d.name === 'vis') {
-          return;
-        }
-        if(d.name === 'Nene Hilario') {
-          return '/pics/nene.png';
-        }
-        if(d.name === 'Tim Hardaway') {
-          return '/pics/tim_hardaway_jr.png';
-        }
-        return '/pics/' + d.name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '').replace('\'', '') + '.png'; 
-      }
-    )
-    .attr('width', '50')
-    .attr('height', '50')
-    .attr('preserveAspectRatio', 'xMinYMin meet')
-    .attr('viewBox', '0 0 50 50')
-    .attr('clip-path', 'url(#clip)')
-    .style('display', function(d) { return d.parent === root ? null : 'none'; });
 
   var text = svg.selectAll("text")
       .data(nodes)
