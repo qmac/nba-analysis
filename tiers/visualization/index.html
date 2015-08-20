@@ -59,7 +59,7 @@ var pack = d3.layout.pack()
 var tooltip = d3.select("body")
   .append("div")
   .style("position", "absolute")
-  .text("");
+  .text("Tiers of NBA Players");
 
 var svg = d3.select('body').append('svg')
     .attr('width', diameter)
@@ -102,8 +102,7 @@ d3.json('nba_clusters.json', function(error, root) {
       .attr('class', function(d) { return d.parent ? d.children ? 'label nnode' : 'label nnode nnode--leaf' : 'label nnode nnode--root'; })
       .text(function(d) { return d.name; });
 
-  var node = svg.selectAll('circle');
-  var textNodes = svg.selectAll('text');
+  var node = svg.selectAll('circle, text');
 
   d3.select('body')
       .style('background', color(-1))
@@ -138,9 +137,6 @@ d3.json('nba_clusters.json', function(error, root) {
     var k = diameter / v[2]; view = v;
     node.attr('transform', function(d) {
       return 'translate(' + (d.x - v[0]) * k + ',' + (d.y - v[1]) * k + ')'; 
-    });
-    textNodes.attr('transform', function(d) {
-      return 'translate(' + (d.x - v[0]) * k + ',' + (d.y - v[1] + 6) * k + ')'; 
     });
     circle.attr('r', function(d) { return d.r * k; });
   }
