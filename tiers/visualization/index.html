@@ -17,10 +17,8 @@
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
 }
 
-.label,
-.node--root,
-.node--leaf {
-  pointer-events: none;
+.nnode--leaf {
+  opacity: 0;
 }
 
 </style>
@@ -58,6 +56,11 @@ var pack = d3.layout.pack()
     .size([diameter - margin, diameter - margin])
     .value(function(d) { return d.size; })
 
+var tooltip = d3.select("body")
+  .append("div")
+  .style("position", "absolute")
+  .text("");
+
 var svg = d3.select('body').append('svg')
     .attr('width', diameter)
     .attr('height', diameter)
@@ -87,7 +90,8 @@ d3.json('nba_clusters.json', function(error, root) {
       })
       .style('fill', function(d) { return d.children ? color(d.depth) : null; })
       .style('display', function(d) { return d.parent === root ? null : 'none'; })
-      .on('click', function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
+      .on('mouseover', function(d) { tooltip.text(d.name); })
+      .on('click', function(d) { if (focus !== d && d.children) zoom(d), d3.event.stopPropagation(); })
 
   var text = svg.selectAll('text')
       .data(nodes)
