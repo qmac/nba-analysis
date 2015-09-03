@@ -28,6 +28,13 @@ def fetch_url(url):
     try:
         response = requests.get(url)
         moments = response.json()["moments"]
+        for moment in moments:
+            first_half = moment[0] <= 2
+            objects = moment[5]
+            ball_object = objects[0]
+            #if ball_object[4] < 7.0 and ((first_half and ball_object[2] > 50) or (not first_half and ball_object[2] <= 50)):
+            #ball_scatter_x.append(ball_object[2])
+            #ball_scatter_y.append(ball_object[3])
         print len(moments)
     except:
         print "error"
