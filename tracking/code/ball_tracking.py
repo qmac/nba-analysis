@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import numpy as np
+import random
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -87,33 +88,42 @@ def draw_court(ax=None, color="gray", lw=1, zorder=0):
 
     return ax
 
-ball_scatter_x = []
-ball_scatter_y = []
+#for i in random.sample(range(1, 1230), 30):
+def fetch_moments(event_range):
+    ball_scatter_x = []
+    ball_scatter_y = []
+    error_count = 0
+    for j in event_range:
+        print j
 
-k = 0
-j = 0
-for i in range (1, 574):
-    print i
+        url = "http://stats.nba.com/stats/locations_getmoments/?eventid=%d&gameid=002140%04d" % (j, 3)
+        response = requests.get(url)
+        try:
+            moments = response.json()["moments"]
+        except (ValueError, KeyError) as e:
+            print "Yikes no json"
+            error_count += 1
+            if error_count > 10:
+                break
+            else:
+                continue
 
-    url = "http://stats.nba.com/stats/locations_getmoments/?eventid=%d&gameid=0041400132" % (i)
-    response = requests.get(url)
-    try:
-        moments = response.json()["moments"]
-    except ValueError:
-        print "Yikes no json"
-        continue
-
-    for moment in moments:
-        first_half = moment[0] <= 2
-        objects = moment[5]
-        ball_object = objects[0]
-        if ball_object[4] < 7.0 and ((first_half and ball_object[2] > 50) or (not first_half and ball_object[2] <= 50)):
+        error_count = 0
+        for moment in moments:
+            first_half = moment[0] <= 2
+            objects = moment[5]
+            ball_object = objects[0]
+            #if ball_object[4] < 7.0 and ((first_half and ball_object[2] > 50) or (not first_half and ball_object[2] <= 50)):
             ball_scatter_x.append(ball_object[2])
             ball_scatter_y.append(ball_object[3])
 
+    db = open("data.csv", "a+")
+
+'''
 g = sns.jointplot(np.array(ball_scatter_x), -np.array(ball_scatter_y), kind="kde", space=0, color="b", zorder=0)
 ax = g.ax_joint
 draw_court(ax, zorder=1)
 ax.set_xlim(0, 101)
 ax.set_ylim(-50, 0)
 plt.show()
+'''
