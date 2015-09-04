@@ -55,11 +55,6 @@ def fetch_url(url):
                 else:
                     off_team = away_team
                     def_team = home_team
-                
-                if off_team == "":
-                    print "FUCCCKKK"
-                if def_team == "":
-                    print "FUCKC EVEN MROE"
 
                 csv_data.append([off_team, def_team, ball_x, ball_y])
 
