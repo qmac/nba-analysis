@@ -86,11 +86,14 @@ def draw_court(ax=None, color="gray", lw=1, zorder=0):
 
     return ax
 
-'''
-g = sns.jointplot(np.array(ball_scatter_x), -np.array(ball_scatter_y), kind="kde", space=0, color="b", zorder=0)
-ax = g.ax_joint
+df = pd.read_csv("ball_data.csv")
+
+df = df[(df["off"] == "NYK")]
+
+plt.scatter(df["x"] , -df["y"])
+
+ax = plt.gca()
 draw_court(ax, zorder=1)
 ax.set_xlim(0, 101)
 ax.set_ylim(-50, 0)
 plt.show()
-'''

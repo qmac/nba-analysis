@@ -12,7 +12,7 @@ NUM_CONCURRENT = 200
 
 def add_urls_to_queue():
     try:
-        for i in range(1, 1230):
+        for i in range(1, 1231):
             for j in range (1, 600):
                 url = "http://stats.nba.com/stats/locations_getmoments/?eventid=%d&gameid=002140%04d" % (j, i)
                 url_queue.put(url)
@@ -58,7 +58,7 @@ def fetch_url(url):
 
                 csv_data.append([off_team, def_team, ball_x, ball_y])
 
-    except ValueError, KeyError:
+    except:
         print "error"
 
     write_to_csv(csv_data)
