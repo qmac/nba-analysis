@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 from matplotlib.patches import Circle, Rectangle, Arc
 
@@ -86,14 +85,14 @@ def draw_court(ax=None, color="gray", lw=1, zorder=0):
 
     return ax
 
-df = pd.read_csv("ball_data.csv")
+teams = pd.read_csv("ball_data.csv").groupby("off")
+for name, df in teams:
+    # plt.hist2d(np.array(df["x"]), np.array(-df["y"]), bins=100, cmap=plt.cm.get_cmap("Blues"))
+    plt.hexbin(df["x"], -df["y"], cmap=plt.cm.get_cmap("Blues"))
 
-df = df[(df["off"] == "NYK")]
-
-plt.scatter(df["x"] , -df["y"])
-
-ax = plt.gca()
-draw_court(ax, zorder=1)
-ax.set_xlim(0, 101)
-ax.set_ylim(-50, 0)
-plt.show()
+    ax = plt.gca()
+    draw_court(ax, zorder=1)
+    ax.set_xlim(0, 101)
+    ax.set_ylim(-50, 0)
+    plt.savefig('./../figures/%s' % (name))
+    plt.show()
