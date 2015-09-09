@@ -87,6 +87,8 @@ def draw_court(ax=None, color="gray", lw=1, zorder=0):
 
 teams = pd.read_csv("./../data/ball_data.csv").groupby("off")
 for name, df in teams:
+    df = df[~((((df["x"] >= 18) & (df["x"] <= 20)) | ((df["x"] >= 74) & (df["x"] <= 76))) & ((df["y"] <= 26) & (df["y"] >= 24)))]
+
     # plt.hist2d(np.array(df["x"]), np.array(-df["y"]), bins=100, cmap=plt.cm.get_cmap("Blues"))
     plt.hexbin(df["x"], -df["y"], cmap=plt.cm.get_cmap("Blues"))
 
@@ -95,4 +97,4 @@ for name, df in teams:
     ax.set_xlim(0, 101)
     ax.set_ylim(-50, 0)
     plt.savefig('./../figures/%s' % (name))
-    plt.show()
+    print name
