@@ -11,6 +11,8 @@ Summary
 
 **tiers**: clustering NBA players into tiers using the k-means clustering algorithm on advanced statistics
 
+**tracking**: visualization of ball tracking data scraped from stats.nba.com
+
 
 Sources
 -------------------
@@ -22,6 +24,8 @@ Sources
 
 * [Basketball-Reference] (http://www.basketball-reference.com/leagues/NBA_2015_advanced.html)
 
+* [NBA Stats (scraped)] (http://stats.nba.com/)
+
 
 Libraries
 -------------------
@@ -31,6 +35,7 @@ Libraries
 * [Numpy] (http://www.numpy.org/)
 * [Matplotlib] (http://matplotlib.org/)
 * [Seaborn] (http://stanford.edu/~mwaskom/software/seaborn/)
+* Other standard Python libraries: sys, csv, time, requests
 
 All of these can be installed using `pip install`
 
