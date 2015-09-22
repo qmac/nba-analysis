@@ -6,7 +6,7 @@ def scrape_shots(name, team, url):
     try:
         response_json = requests.get(players_url).json() 
         shots_data = response_json["resultSets"][0]["rowSet"]
-        #shots_data = [shot.extend([name, team]) for shot in shots_data]
+        shots_data = [shot + [name, team] for shot in shots_data]
     except:
         print "error"
 
