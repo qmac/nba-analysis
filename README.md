@@ -30,14 +30,8 @@ Sources
 Libraries
 -------------------
 
-* [Scikit Learn] (http://scikit-learn.org/stable/)
-* [Pandas] (http://pandas.pydata.org/)
-* [Numpy] (http://www.numpy.org/)
-* [Matplotlib] (http://matplotlib.org/)
-* [Seaborn] (http://stanford.edu/~mwaskom/software/seaborn/)
-* Other standard Python libraries: sys, csv, time, requests
-
-All of these can be installed using `pip install`
+Listed in requirements.txt
+All of them can be installed using `pip install -r requirements.txt` in the repository directory
 
 
 Disclaimer
