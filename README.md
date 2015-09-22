@@ -30,8 +30,7 @@ Sources
 Libraries
 -------------------
 
-Listed in requirements.txt
-All of them can be installed using `pip install -r requirements.txt` in the repository directory
+All of the needed libraries can be installed using `pip install -r requirements.txt` in the repository directory.
 
 
 Disclaimer
