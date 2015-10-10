@@ -8,18 +8,22 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-df = pd.DataFrame.from_csv('./../data/steph_shots.csv')
-
-feature_columns = ['period', 
-                'minutes_remaining', 
-                'shot_distance', 
-                'x', 
-                'y', 
+feature_columns = ['location', 
+                'period', 
+                'shot_dist', 
                 'dribbles', 
                 'touch_time', 
-                'defender_distance', 
+                'close_def_dist', 
                 'shot_clock'
                 ]
+
+class_column = 'fgm'
+
+df = pd.DataFrame.from_csv('./../data/shot_data.csv')
+#df = df[(df['player_name'] == 'Curry, Stephen')]
+df = df[(df['player_team'] == 'GSW')]
+df = df.dropna(subset=feature_columns)
+df['location'] = (df['location'] == 'H').astype(int)
 
 classifiers = [GaussianNB(), SVC(), KNeighborsClassifier(), DecisionTreeClassifier()]
 training_range = np.arange(0.50, 0.90, 0.02)
@@ -33,10 +37,10 @@ for i in training_range:
         testing_set = df[df['is_training']==False]
 
         trainingFeatures = training_set[feature_columns]
-        trainingTargets = np.array(training_set['shot_made_flag']).astype(bool)
+        trainingTargets = np.array(training_set['fgm']).astype(bool)
 
         testingFeatures = testing_set[feature_columns]
-        testingTargets = np.array(testing_set['shot_made_flag']).astype(bool)
+        testingTargets = np.array(testing_set['fgm']).astype(bool)
 
         for classifier in classifiers:
             print "------------------------------------------"

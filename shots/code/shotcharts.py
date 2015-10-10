@@ -75,10 +75,10 @@ def draw_court(ax=None, color='black', lw=2, outer_lines=False):
 
 def show_comparison(predicted, actual):
     # Setup data for visualization
-    predicted_makes = predicted[(predicted['shot_made_flag'] == True)]
-    predicted_misses = predicted[(predicted['shot_made_flag'] == False)]
-    actual_makes = actual[(actual['shot_made_flag'] == True)]
-    actual_misses = actual[(actual['shot_made_flag'] == False)]
+    predicted_makes = predicted[(predicted['fgm'] == True)]
+    predicted_misses = predicted[(predicted['fgm'] == False)]
+    actual_makes = actual[(actual['fgm'] == True)]
+    actual_misses = actual[(actual['fgm'] == False)]
 
     # Setup plots
     sns.set_style("white")

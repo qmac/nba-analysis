@@ -1,2 +1,4 @@
 .DS_Store
+*.pyc
 tracking/data/ball_data.csv
+shots/data/shot_data.csv
