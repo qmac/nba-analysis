@@ -17,7 +17,7 @@ def write_to_csv(data):
         writer.writerows(data)
 
 # Write headers first
-write_to_csv([["name", "player_id","season_id","league_id","team_id","team_abbreviation","player_age",
+write_to_csv([["name", "position", "player_id","season_id","league_id","team_id","team_abbreviation","player_age",
     "gp","gs","min","fgm","fga","fg_pct","fg3m","fg3a","fg3_pct","ftm","fta","ft_pct","oreb",
     "dreb","reb","ast","stl","blk","tov","pf","pts"]])
 
@@ -29,9 +29,12 @@ for player_record in players_data:
     player_id, name = player_record[0], player_record[1]
     print player_id, name
 
+    player_url = "http://stats.nba.com/stats/commonplayerinfo?LeagueID=00&PlayerID=%s" % (player_id)
+    player_info = scrape(player_url)
+    position = player_info[0][14]
+
     shots_url = "http://stats.nba.com/stats/playercareerstats?LeagueID=00&PerMode=PerGame&PlayerID=%s" % (player_id)
-    
     season_data = scrape(shots_url)
-    season_data = [[name] + season_stats for season_stats in season_data]
+    season_data = [[name, position] + season_stats for season_stats in season_data]
     write_to_csv(season_data)
 
