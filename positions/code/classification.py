@@ -4,32 +4,47 @@ from positionchart import radar_graph
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load data from CSV
-df = pd.DataFrame.from_csv('./../data/stats.dat', sep=' ')
 
-# Remove outliers
-df = df[(df['pos'] != '??') & (df['pts'] > 100)]
+feature_columns = ['fgm', 
+                'fga', 
+                'fg3m', 
+                'fg3a', 
+                'ftm', 
+                'fta',
+                'oreb',
+                'reb',
+                'ast',
+                'stl',
+                'tov',
+                'blk', 
+                'pf',
+                'pts',
+                ]
+
+class_column = 'position'
+
+df = pd.DataFrame.from_csv('./../data/career_data.csv')
+df = df[(df['gp'] > 58)]
+df = df.dropna(subset=feature_columns+[class_column])
 
 # Run the classifier
 clf = KNeighborsClassifier(n_neighbors=10)
-training = df.drop('ginobili,manu')
+training = df.drop('Ginobili, Manu')
 
-clf.fit(training.drop('pos', 1), training['pos'])
+clf.fit(training[feature_columns], training[class_column])
 
-player = df.loc['ginobili,manu']
-print clf.predict(player.drop('pos', 1))
+player = df.loc['Ginobili, Manu']
+print clf.predict(player[feature_columns])
 
-prediction_probabilities = clf.predict_proba(player.drop('pos', 1))
+prediction_probabilities = clf.predict_proba(player[feature_columns])
 print prediction_probabilities
 
-# These have to be hard coded since year info is not in the data set
-years = ['2004-2005', '2005-2006', '2006-2007', '2007-2008', '2008-2009', '2009-2010', '2010-2011', '2011-2012', '2012-2013']
-
+years = player['season_id']
 
 for i in range(len(prediction_probabilities)):
-    labels = ['C', 'PF', 'PG', 'SF', 'SG']
+    labels = ['C', 'C-F', 'F', 'F-C', 'F-G', 'G', 'G-F']
     values = prediction_probabilities[i]
-    optimum = [1.0, 1.0, 1.0, 1.0, 1.0]
+    optimum = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
     radar_graph(labels, values, optimum)
 
