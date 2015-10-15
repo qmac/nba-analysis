@@ -35,7 +35,8 @@ def fetch_url(url):
         away_team = response_json["visitor"]["abbreviation"]
         for moment in moments:
             first_half = moment[0] <= 2
-            ball_up_court = moment[3] <= 19.5 # Check the shot clock 
+            shot_clock = moment[3]
+            ball_up_court = shot_clock <= 19.5 # Check the shot clock 
 
             ball_object = moment[5][0]
 
@@ -56,7 +57,7 @@ def fetch_url(url):
                     off_team = away_team
                     def_team = home_team
 
-                csv_data.append([off_team, def_team, ball_x, ball_y])
+                csv_data.append([off_team, def_team, ball_x, ball_y, shot_clock])
 
     except:
         print "error"
@@ -71,6 +72,7 @@ def write_to_csv(data):
     lock.release()
 
 lock = Lock()
+write_to_csv([["off", "def", "x", "y", "shot_clock"]])
 url_queue = Queue(NUM_CONCURRENT * 2)
 for i in range(NUM_CONCURRENT):
     t = Thread(target=worker)
