@@ -1,9 +1,10 @@
 from sklearn.neighbors import KNeighborsClassifier
-from positionchart import radar_graph
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
+import visualization
 
 feature_columns = ['fgm', 
                 'fga', 
@@ -37,17 +38,9 @@ player = df.loc['Ginobili, Manu']
 print clf.predict(player[feature_columns])
 
 prediction_probabilities = clf.predict_proba(player[feature_columns])
-print prediction_probabilities
+prediction_df = pd.DataFrame(prediction_probabilities, columns=['C', 'C-F', 'F', 'F-C', 'F-G', 'G', 'G-F'])
+prediction_df['season'] = np.array(player['season_id'])
+print prediction_df
 
-years = player['season_id']
+visualization.predictions_to_json(prediction_df)
 
-for i in range(len(prediction_probabilities)):
-    labels = ['C', 'C-F', 'F', 'F-C', 'F-G', 'G', 'G-F']
-    values = prediction_probabilities[i]
-    optimum = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-
-    radar_graph(labels, values, optimum)
-
-    plt.suptitle('Manu Ginobili %s' % (years[i]))
-    plt.savefig('./../figures/manu_ginobili_%s' % (years[i]))
-    plt.show()
