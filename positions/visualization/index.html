@@ -10,6 +10,7 @@
     }
     .radar-chart .area {
       fill-opacity: 0.7;
+      fill: #ADD8E6;
     }
     .radar-chart.focus .area {
       fill-opacity: 0.3;
@@ -17,34 +18,25 @@
     .radar-chart.focus .area.focused {
       fill-opacity: 0.9;
     }
-    .area.germany, .germany .circle {
-      fill: #FFD700;
-      stroke: none;
-    }
-    .area.argentina, .argentina .circle {
-      fill: #ADD8E6;
-      stroke: none;
-    }
   </style>
 
   <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
   <script type="text/javascript" src="radar-chart.js"></script>
-
-  <script type="text/javascript">
-    RadarChart.defaultConfig.color = function() {};
-    RadarChart.defaultConfig.radius = 1;
-  </script>
 </head>
 <body>
-  <h1>Radar Chart</h1>
-  <div class="chart-container"></div>
+  <h1>Positions Radar Chart</h1>
   <script type="text/javascript">
+    RadarChart.defaultConfig.radius = 1;
     d3.json("positions.json", function(data) {
-      RadarChart.draw(".chart-container", data);
-      console.log("trying to draw");
+      for(var i=0;i<data.length;i++){
+        var name = "chart" + data[i]["className"];
+        d3.select("body").append("div").attr("class", name);
+
+        var arr = [data[i]];
+        RadarChart.draw("."+name, arr);
+      }
     });
   </script>
-
 </body>
 </html>
