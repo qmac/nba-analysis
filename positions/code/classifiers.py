@@ -8,8 +8,27 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-df = pd.DataFrame.from_csv('./../data/stats.dat', sep=' ')
-df = df[(df['pos'] != '??') & (df['pts'] > 100)]
+feature_columns = ['fgm', 
+                'fga', 
+                'fg3m', 
+                'fg3a', 
+                'ftm', 
+                'fta',
+                'oreb',
+                'reb',
+                'ast',
+                'stl',
+                'tov',
+                'blk', 
+                'pf',
+                'pts',
+                ]
+
+class_column = 'position'
+
+df = pd.DataFrame.from_csv('./../data/career_data.csv')
+df = df[(df['gp'] > 58)]
+df = df.dropna(subset=feature_columns+[class_column])
 
 classifiers = [GaussianNB(), SVC(), KNeighborsClassifier(), DecisionTreeClassifier()]
 training_range = np.arange(0.50, 0.90, 0.02)
@@ -22,11 +41,11 @@ for i in training_range:
         training_set = df[df['is_training']==True]
         testing_set = df[df['is_training']==False]
 
-        trainingFeatures = training_set.drop('pos', 1)
-        trainingTargets = training_set['pos']
+        trainingFeatures = training_set[feature_columns]
+        trainingTargets = training_set[class_column]
 
-        testingFeatures = testing_set.drop('pos', 1)
-        testingTargets = testing_set['pos']
+        testingFeatures = testing_set[feature_columns]
+        testingTargets = testing_set[class_column]
 
         for classifier in classifiers:
             print "------------------------------------------"

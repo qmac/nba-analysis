@@ -18,10 +18,6 @@ Sources
 -------------------
 * [Fivethirtyeight] (https://github.com/fivethirtyeight/data/tree/master/nba-elo)
 
-* [Doug Stats] (http://www.dougstats.com/)
-
-* [NBAsavant] (http://nbasavant.com/index.php)
-
 * [Basketball-Reference] (http://www.basketball-reference.com/leagues/NBA_2015_advanced.html)
 
 * [NBA Stats (scraped)] (http://stats.nba.com/)
