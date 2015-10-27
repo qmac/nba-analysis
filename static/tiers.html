@@ -40,7 +40,7 @@ var encodedName = function(player_name) {
 }
 
 var filePath = function(player_name) {
-  return 'pics/' + encodedName(player_name) + '.png';
+  return 'static/pics/' + encodedName(player_name) + '.png';
 }
 
 var margin = 10,
@@ -67,7 +67,7 @@ var svg = d3.select('body').append('svg')
   .append('g')
     .attr('transform', 'translate(' + diameter / 2 + ',' + diameter / 2 + ')');
 
-d3.json('nba_clusters.json', function(error, root) {
+d3.json('static/nba_clusters.json', function(error, root) {
   if (error) throw error;
 
   var focus = root,
