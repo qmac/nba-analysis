@@ -36,7 +36,7 @@ def predict_positions(player_name):
     clf.fit(training[FEATURE_COLUMNS], training[CLASS_COLUMN])
 
     player = df.loc[player_name]
-    print clf.predict(player[FEATURE_COLUMNS])
+    #print clf.predict(player[FEATURE_COLUMNS])
 
     prediction_probabilities = clf.predict_proba(player[FEATURE_COLUMNS])
     prediction_df = pd.DataFrame(prediction_probabilities, columns=['C', 'C-F', 'F', 'F-C', 'F-G', 'G', 'G-F'])

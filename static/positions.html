@@ -26,10 +26,27 @@
 </head>
 <body>
   <h1>Positions Radar Chart</h1>
+  <select id='players'/>
+  <script type="text/javascript">
+    d3.json("/_get_names", function(data) {
+      for (var i=0;i<data.length;i++) {
+        d3.select("#players").append("option").text(data[i]['name']);
+      }
+    });
+  </script>
+
   <script type="text/javascript">
     RadarChart.defaultConfig.radius = 1;
-    d3.json("/_get_positions?player=Ginobili, Manu", function(data) {
-      for(var i=0;i<data.length;i++){
+
+    // Get the player selected in the drop down
+    var d = document.getElementById('players');
+    var player = d.options[d.selectedIndex].text;
+    console.log(player);
+
+    // Draw that player's radar chart
+    var url = "/_get_positions?player=" + player
+    d3.json(url, function(data) {
+      for (var i=0;i<data.length;i++) {
         var name = "chart" + data[i]["className"];
         d3.select("body").append("div").attr("class", name);
 
