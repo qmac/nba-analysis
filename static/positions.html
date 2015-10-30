@@ -24,36 +24,43 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
   <script type="text/javascript" src="static/radar-chart.js"></script>
 </head>
-<body>
+<body onload='getPlayers()' id='body'>
   <h1>Positions Radar Chart</h1>
-  <select id='players'/>
-  <script type="text/javascript">
-    d3.json("/_get_names", function(data) {
-      for (var i=0;i<data.length;i++) {
-        d3.select("#players").append("option").text(data[i]['name']);
-      }
-    });
-  </script>
-
+  <select id='players' onchange="drawCharts()">
+    <option selected='selected'>Select a player</option>
+  </select>
   <script type="text/javascript">
     RadarChart.defaultConfig.radius = 1;
 
-    // Get the player selected in the drop down
-    var d = document.getElementById('players');
-    var player = d.options[d.selectedIndex].text;
-    console.log(player);
+    function getPlayers() {
+      d3.json("/_get_names", function(data) {
+        for (var i=0;i<data.length;i++) {
+          d3.select("#players").append("option").text(data[i]['name']);
+        }
+      });
+    }
 
-    // Draw that player's radar chart
-    var url = "/_get_positions?player=" + player
-    d3.json(url, function(data) {
-      for (var i=0;i<data.length;i++) {
-        var name = "chart" + data[i]["className"];
-        d3.select("body").append("div").attr("class", name);
+    function drawCharts() {
+      // Remove the previous player's charts from the DOM
+      d3.selectAll(".chart").remove();
 
-        var arr = [data[i]];
-        RadarChart.draw("."+name, arr);
-      }
-    });
+      // Get the player selected in the drop down
+      var d = document.getElementById('players');
+      var player = d.options[d.selectedIndex].text;
+      console.log(player);
+
+      // Draw that player's radar chart
+      var url = "/_get_positions?player=" + player
+      d3.json(url, function(data) {
+        for (var i=0;i<data.length;i++) {
+          var name = "chart" + data[i]["className"];
+          d3.select("body").append("div").attr("id", name).attr("class", "chart");
+
+          var arr = [data[i]];
+          RadarChart.draw("#"+name, arr);
+        }
+      });
+    }
   </script>
 </body>
 </html>
