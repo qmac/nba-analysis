@@ -1,11 +1,9 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 
 import json
 import pandas as pd
 
-import sys
-sys.path.append('positions/code/')
-import classification
+import positions.code.classification as pos_classification
 
 app = Flask(__name__)
 
@@ -25,11 +23,11 @@ def positions():
 @app.route('/_get_positions')
 def run_positions():
     player = request.args.get('player')
-    results = classification.predict_positions(player)
+    results = pos_classification.predict_positions(player)
     return json.dumps(results)
 
-@app.route('/_get_names')
-def get_names():
+@app.route('/_get_all_names')
+def get_all_names():
     df = pd.DataFrame.from_csv('positions/data/career_data.csv')
     names_json = [{'name':name} for name in df.index.unique()]
     return json.dumps(names_json)

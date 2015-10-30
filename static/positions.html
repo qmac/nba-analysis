@@ -33,7 +33,7 @@
     RadarChart.defaultConfig.radius = 1;
 
     function getPlayers() {
-      d3.json("/_get_names", function(data) {
+      d3.json("/_get_all_names", function(data) {
         for (var i=0;i<data.length;i++) {
           d3.select("#players").append("option").text(data[i]['name']);
         }
