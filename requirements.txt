@@ -1,6 +1,5 @@
 matplotlib
 numpy
-scipy
 scikit-learn
 seaborn
 requests
