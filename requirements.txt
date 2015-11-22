@@ -5,3 +5,4 @@ scikit-learn
 seaborn
 requests
 pandas
+flask
