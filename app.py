@@ -4,7 +4,7 @@ import json
 import pandas as pd
 import os
 
-#import positions.code.classification as pos_classification
+import positions.code.classification as pos_classification
 
 app = Flask(__name__)
 
