@@ -72,5 +72,4 @@ fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitt
 clustered_players = cluster(fitting_data)
 
 # Set up for visualization
-visualization.scrape_pictures(clustered_players)
 visualization.clusters_to_json(clustered_players)

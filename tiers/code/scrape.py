@@ -1,6 +1,39 @@
 import requests
 import csv
 import os
+import urllib2
+
+import numpy as np
+import pandas as pd
+
+def scrape_pictures(players):
+    directory = './../visualization/pics/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    for player in players:
+        # Stupid edge cases
+        if player == 'Nene Hilario':
+            player = 'Nene'
+        if player == 'Tim Hardaway':
+            player = 'Tim Hardaway Jr'
+        if player == 'Jose Juan Barea':
+            player = 'Jose Barea'
+
+        url_name = player.lower().replace(' ', '_').replace('.', '').replace('\'', '')
+        print url_name
+
+        url = 'http://i.cdn.turner.com/nba/nba/.element/img/2.0/sect/statscube/players/large/%s.png' % (url_name)
+
+        try:  
+            image = urllib2.urlopen(url)
+            data = image.read()
+
+            with open('%s%s.png' % (directory, url_name), 'w+') as outfile:
+                outfile.write(data)
+
+        except:
+            continue
 
 def write_to_csv(path, data):
     with open(path, 'a+') as db:
@@ -30,3 +63,7 @@ for year in YEARS:
     data = response_json['resultSets'][0]['rowSet']
     write_to_csv(path, [headers])
     write_to_csv(path, data)
+
+df = pd.DataFrame.from_csv('./../data/advanced_stats_2014-15.csv')
+players = np.array(df['PLAYER_NAME'])
+scrape_pictures(players)
