@@ -16,6 +16,12 @@ def write_to_csv(data):
         writer = csv.writer(db, delimiter=',')
         writer.writerows(data)
 
+# Delete file if already exists
+try:
+    os.remove('./../data/shot_data.csv')
+except OSError:
+    pass
+
 # Write headers first
 write_to_csv([["game_id","matchup","location","w","final_margin",
     "shot_number","period","game_clock","shot_clock","dribbles",
