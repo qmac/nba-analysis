@@ -36,36 +36,39 @@ def plot_silhouettes(cluster_data):
     plt.savefig('./../figures/silhouettes.png')
 
 def cluster(cluster_data):
-    clstr = KMeans(n_clusters=11)
+    clstr = KMeans(n_clusters=DEFAULT_K)
     clstr.fit(cluster_data)
 
     df['tier'] = clstr.labels_
-    results = df[['Player', 'tier']]
+    results = df[['PLAYER_NAME', 'tier']]
     return results
 
 def cluster_agg(cluster_data):
-    clstr = AgglomerativeClustering(n_clusters=11, linkage='ward')
+    clstr = AgglomerativeClustering(n_clusters=DEFAULT_K, linkage='ward')
     clstr.fit(cluster_data)
 
     df['tier'] = clstr.labels_
-    results = df[['Player', 'tier']]
+    results = df[['PLAYER_NAME', 'tier']]
     return results
 
 # Load data from CSV
-df = pd.DataFrame.from_csv('./../data/leagues_NBA_2015_advanced.csv')
+df = pd.DataFrame.from_csv('./../data/advanced_stats_2014-15.csv')
 
 # Remove outliers
-df = df[(df['G'] >= 58)]
+df = df[(df['GP'] >= 58)]
 
 feature_columns = [
-                'PER', 
-                'TS%', 
-                'USG%', 
-                'WS/48', 
-                'BPM'
+                'PIE', 
+                'TS_PCT', 
+                'NET_RATING', 
+                'USG_PCT'
                 ]
 
 fitting_data = df[feature_columns]
+
+# Normalize the fitting data
+fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
+
 clustered_players = cluster(fitting_data)
 
 # Set up for visualization
