@@ -1,5 +1,6 @@
 import requests
 import csv
+import os
 
 def scrape(url):
     try:
@@ -15,6 +16,12 @@ def write_to_csv(data):
     with open('./../data/career_data.csv', 'a+') as db:
         writer = csv.writer(db, delimiter=',')
         writer.writerows(data)
+
+# Delete file if already exists
+try:
+    os.remove('./../data/career_data.csv')
+except OSError:
+    pass
 
 # Write headers first
 write_to_csv([["name", "position", "player_id","season_id","league_id","team_id","team_abbreviation","player_age",
