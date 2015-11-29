@@ -18,8 +18,6 @@ Sources
 -------------------
 * [Fivethirtyeight] (https://github.com/fivethirtyeight/data/tree/master/nba-elo)
 
-* [Basketball-Reference] (http://www.basketball-reference.com/leagues/NBA_2015_advanced.html)
-
 * [NBA Stats (scraped)] (http://stats.nba.com/)
 
 
@@ -32,4 +30,4 @@ All of the needed libraries can be installed using `pip install -r requirements.
 Disclaimer
 -------------------
 
-All of these experiments/mini-projects are more for proof-of-concept and practice than true analysis. Most of the data sets could use significant refinement. Moreover the analysis is rudimentary and the scikit-learn algorithms used could be tuned much further by manipulating parameters.
+All of these experiments/mini-projects are more for proof-of-concept and practice than true analysis. The analysis is rudimentary and the scikit-learn algorithms used could be tuned much further by manipulating parameters.
