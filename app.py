@@ -5,6 +5,7 @@ import pandas as pd
 import os
 
 import positions.code.classification as pos_classification
+import tiers.code.cluster as clstr
 
 app = Flask(__name__)
 
@@ -32,6 +33,12 @@ def get_all_names():
     df = pd.DataFrame.from_csv('positions/data/career_data.csv')
     names_json = [{'name':name} for name in df.index.unique()]
     return json.dumps(names_json)
+
+@app.route('/_get_tiers')
+def get_tiers():
+    year = request.args.get('year')
+    tiers_results = clstr.run_clustering(year)
+    return json.dumps(tiers_results)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

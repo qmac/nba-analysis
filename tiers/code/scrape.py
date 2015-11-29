@@ -64,6 +64,6 @@ for year in YEARS:
     write_to_csv(path, [headers])
     write_to_csv(path, data)
 
-df = pd.DataFrame.from_csv('./../data/advanced_stats_2014-15.csv')
+df = pd.DataFrame.from_csv('./../data/advanced_stats_2015-16.csv')
 players = np.array(df['PLAYER_NAME'])
 scrape_pictures(players)
