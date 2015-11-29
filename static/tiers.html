@@ -31,6 +31,10 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
 <script type=text/javascript>
   function drawTiers() {
+    // Remove the previous svg
+    d3.select('svg').remove();
+    d3.select('#tooltip').remove();
+
     var d = document.getElementById('years');
     var year = d.options[d.selectedIndex].text;
     var url = '/_get_tiers?year=' + year
@@ -70,6 +74,7 @@
 
     var tooltip = d3.select("body")
       .append("div")
+      .attr("id", "tooltip")
       .style("position", "absolute")
       .text("Tiers of NBA Players");
 
@@ -117,7 +122,6 @@
       var node = svg.selectAll('circle, text');
 
       d3.select('body')
-          .style('background', color(-1))
           .on('click', function() { zoom(root); });
 
       zoomTo([root.x, root.y, root.r * 2 + margin]);
