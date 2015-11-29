@@ -13,13 +13,13 @@ def scrape(url):
     return
 
 def write_to_csv(data):
-    with open('./../data/career_data.csv', 'a+') as db:
+    with open('positions/data/career_data.csv', 'a+') as db:
         writer = csv.writer(db, delimiter=',')
         writer.writerows(data)
 
 # Delete file if already exists
 try:
-    os.remove('./../data/career_data.csv')
+    os.remove('positions/data/career_data.csv')
 except OSError:
     pass
 

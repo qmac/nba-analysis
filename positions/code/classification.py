@@ -4,8 +4,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-import visualization
-
 FEATURE_COLUMNS = ['fgm', 
                 'fga', 
                 'fg3m', 
@@ -24,8 +22,13 @@ FEATURE_COLUMNS = ['fgm',
 
 CLASS_COLUMN = 'position'
 
+def predictions_to_json(predictions):
+    axes = ['G', 'G-F', 'F-G', 'F-C', 'C-F', 'C', 'F']
+    seasons = [{'className': row[1]['season'], 'axes':[{'axis': axis, 'value': row[1][axis]} for axis in axes]} for row in predictions.iterrows()]
+    return seasons
+
 def predict_positions(player_name):
-    df = pd.DataFrame.from_csv('/Users/quinnmac/Documents/GitHub/nba-analysis/positions/data/career_data.csv')
+    df = pd.DataFrame.from_csv('positions/data/career_data.csv')
     df = df[(df['gp'] > 58)]
     df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
 
@@ -42,5 +45,5 @@ def predict_positions(player_name):
     prediction_df = pd.DataFrame(prediction_probabilities, columns=['C', 'C-F', 'F', 'F-C', 'F-G', 'G', 'G-F'])
     prediction_df['season'] = np.array(player['season_id'])
 
-    return visualization.predictions_to_json(prediction_df)
+    return predictions_to_json(prediction_df)
 
