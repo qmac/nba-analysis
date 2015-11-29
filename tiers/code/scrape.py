@@ -40,6 +40,9 @@ def write_to_csv(path, data):
         writer = csv.writer(db, delimiter=',')
         writer.writerows(data)
 
+if not os.path.exists('tiers/data/'):
+    os.makedirs('tiers/data/')
+
 YEARS = ['2014-15', '2015-16']
 for year in YEARS:
     path = 'tiers/data/advanced_stats_%s.csv' % (year)

@@ -17,6 +17,9 @@ def write_to_csv(data):
         writer = csv.writer(db, delimiter=',')
         writer.writerows(data)
 
+if not os.path.exists('positions/data/'):
+    os.makedirs('positions/data/')
+
 # Delete file if already exists
 try:
     os.remove('positions/data/career_data.csv')
