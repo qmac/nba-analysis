@@ -1,6 +1,8 @@
 matplotlib
-numpy
-scipy
-scikit-learn
+numpy==1.9.1
+scipy==0.14.0
+scikit-learn==0.16.1
 seaborn
 requests
+pandas
+flask

@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 def scrape_pictures(players):
-    directory = './../visualization/pics/'
+    directory = 'static/pics/'
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -40,9 +40,12 @@ def write_to_csv(path, data):
         writer = csv.writer(db, delimiter=',')
         writer.writerows(data)
 
+if not os.path.exists('tiers/data/'):
+    os.makedirs('tiers/data/')
+
 YEARS = ['2014-15', '2015-16']
 for year in YEARS:
-    path = './../data/advanced_stats_%s.csv' % (year)
+    path = 'tiers/data/advanced_stats_%s.csv' % (year)
 
     # Delete file if already exists
     try:
@@ -64,6 +67,7 @@ for year in YEARS:
     write_to_csv(path, [headers])
     write_to_csv(path, data)
 
-df = pd.DataFrame.from_csv('./../data/advanced_stats_2014-15.csv')
-players = np.array(df['PLAYER_NAME'])
+df_2014 = pd.DataFrame.from_csv('tiers/data/advanced_stats_2014-15.csv')
+df_2015 = pd.DataFrame.from_csv('tiers/data/advanced_stats_2015-16.csv')
+players = np.append(np.array(df_2014['PLAYER_NAME']), np.array(df_2015['PLAYER_NAME']))
 scrape_pictures(players)

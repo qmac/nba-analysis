@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+<link rel="stylesheet" href="static/radar/radar-chart.css">
+<head>
+  <style>
+    body {
+      padding: 20px;
+    }
+    .radar-chart .area {
+      fill-opacity: 0.7;
+      fill: #ADD8E6;
+    }
+    .radar-chart.focus .area {
+      fill-opacity: 0.3;
+    }
+    .radar-chart.focus .area.focused {
+      fill-opacity: 0.9;
+    }
+  </style>
+
+  <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
+  <script type="text/javascript" src="static/radar/radar-chart.js"></script>
+</head>
+<body onload='getPlayers()' id='body'>
+  <h1>Positions Radar Chart</h1>
+  <select id='players' onchange="drawCharts()">
+    <option selected='selected'>Select a player</option>
+  </select>
+  <script type="text/javascript">
+    RadarChart.defaultConfig.radius = 1;
+
+    function getPlayers() {
+      d3.json("/_get_all_names", function(data) {
+        for (var i=0;i<data.length;i++) {
+          d3.select("#players").append("option").text(data[i]['name']);
+        }
+      });
+    }
+
+    function drawCharts() {
+      // Remove the previous player's charts from the DOM
+      d3.selectAll(".chart").remove();
+
+      // Get the player selected in the drop down
+      var d = document.getElementById('players');
+      var player = d.options[d.selectedIndex].text;
+      console.log(player);
+
+      // Draw that player's radar chart
+      var url = "/_get_positions?player=" + player
+      d3.json(url, function(data) {
+        for (var i=0;i<data.length;i++) {
+          var name = "chart" + data[i]["className"];
+          d3.select("body").append("div").attr("id", name).attr("class", "chart");
+
+          var arr = [data[i]];
+          RadarChart.draw("#"+name, arr);
+        }
+      });
+    }
+  </script>
+</body>
+</html>

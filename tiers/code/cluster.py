@@ -6,9 +6,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-import visualization
+import json
 
 DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
+SIZE = 2000 # Size of tier bubbles
 
 # Elbow Method for determining k
 def plot_inertias(cluster_data):
@@ -38,10 +39,7 @@ def plot_silhouettes(cluster_data):
 def cluster(cluster_data):
     clstr = KMeans(n_clusters=DEFAULT_K)
     clstr.fit(cluster_data)
-
-    df['tier'] = clstr.labels_
-    results = df[['PLAYER_NAME', 'tier']]
-    return results
+    return clstr.labels_
 
 def cluster_agg(cluster_data):
     clstr = AgglomerativeClustering(n_clusters=DEFAULT_K, linkage='ward')
@@ -51,25 +49,30 @@ def cluster_agg(cluster_data):
     results = df[['PLAYER_NAME', 'tier']]
     return results
 
-# Load data from CSV
-df = pd.DataFrame.from_csv('./../data/advanced_stats_2014-15.csv')
+def clusters_to_json(player_clusters):
+    players_dict = {}
+    players_grouped = player_clusters.groupby('tier')
+    players_dict['name'] = 'vis'
+    players_dict['children'] = map(lambda x:{'name':'Tier %d' % (x[0]), 'children':map(lambda x:{'name':x, 'size':SIZE}, x[1]['PLAYER_NAME'])}, players_grouped)
+    print players_dict
+    return players_dict
 
-# Remove outliers
-df = df[(df['GP'] >= 58)]
+def run_clustering(year):
+    # Load data from CSV
+    df = pd.DataFrame.from_csv('tiers/data/advanced_stats_%s.csv' % (year))
 
-feature_columns = [
-                'PIE', 
-                'TS_PCT', 
-                'NET_RATING', 
-                'USG_PCT'
-                ]
+    # Remove outliers
+    df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
 
-fitting_data = df[feature_columns]
+    feature_columns = [
+                    'PIE', 
+                    'TS_PCT', 
+                    'NET_RATING', 
+                    'USG_PCT'
+                    ]
+    fitting_data = df[feature_columns]
+    fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
 
-# Normalize the fitting data
-fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
-
-clustered_players = cluster(fitting_data)
-
-# Set up for visualization
-visualization.clusters_to_json(clustered_players)
+    df['tier'] = cluster(fitting_data)
+    clustered_players = df[['PLAYER_NAME', 'tier']]
+    return clusters_to_json(clustered_players)
