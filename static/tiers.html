@@ -40,9 +40,11 @@
     d3.select('svg').remove();
     d3.select('#tooltip').remove();
 
+    // Get the year selected in the drop down
     var year_select = document.getElementById('years');
     var year = year_select.options[year_select.selectedIndex].text;
 
+    // Get the algorithm selected in the drop down
     var alg_select = document.getElementById('algorithms');
     var algorithm = alg_select.options[alg_select.selectedIndex].text;
 

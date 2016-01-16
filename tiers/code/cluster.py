@@ -10,6 +10,12 @@ import json
 
 DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
 SIZE = 2000 # Size of tier bubbles
+FEATURE_COLUMNS = [
+                    'PIE', 
+                    'TS_PCT', 
+                    'NET_RATING', 
+                    'USG_PCT'
+                    ]
 
 # Elbow Method for determining k
 def plot_inertias(cluster_data):
@@ -52,13 +58,7 @@ def cluster(year, algorithm):
     df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
 
     # Set up fitting data
-    feature_columns = [
-                    'PIE', 
-                    'TS_PCT', 
-                    'NET_RATING', 
-                    'USG_PCT'
-                    ]
-    fitting_data = df[feature_columns]
+    fitting_data = df[FEATURE_COLUMNS]
     fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
 
     # Run clustering
