@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 import positions.code.classification as pos_classification
-import tiers.code.cluster as clstr
+from tiers.code.cluster import cluster
 
 app = Flask(__name__)
 
@@ -37,7 +37,9 @@ def get_all_names():
 @app.route('/_get_tiers')
 def get_tiers():
     year = request.args.get('year')
-    tiers_results = clstr.run_clustering(year)
+    algorithm = request.args.get('algorithm')
+
+    tiers_results = cluster(year, algorithm)
     return json.dumps(tiers_results)
 
 if __name__ == '__main__':
