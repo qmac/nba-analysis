@@ -43,7 +43,7 @@ def pos_classify(player_name, algorithm):
 
     # Initialize the classifier
     clf = eval(algorithm)()
-    if algorithm is 'SVC':
+    if algorithm == 'SVC':
         clf.probability = True
 
     # Perform classifier training
