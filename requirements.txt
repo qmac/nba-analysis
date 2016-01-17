@@ -6,3 +6,5 @@ seaborn
 requests
 pandas
 flask
+flask-sqlalchemy
+psycopg2
