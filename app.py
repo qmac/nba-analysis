@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from flask.ext.sqlalchemy import SQLAlchemy
 
 import json
 import pandas as pd
