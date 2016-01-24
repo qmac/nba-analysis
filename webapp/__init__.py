@@ -11,11 +11,11 @@ import tiers.code.cluster as clstr
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
+db_engine = db.get_engine(app)
 
 @app.route('/')
 def index():
     return "HI"
-    #return render_template('index.html')
 
 @app.route('/tiers')
 def tiers():
@@ -33,7 +33,7 @@ def run_positions():
 
 @app.route('/_get_all_names')
 def get_all_names():
-    df = pd.DataFrame.from_csv('positions/data/career_data.csv')
+    df = pd.DataFrame.from_csv('webapp/positions/data/career_data.csv')
     names_json = [{'name':name} for name in df.index.unique()]
     return json.dumps(names_json)
 
@@ -42,7 +42,3 @@ def get_tiers():
     year = request.args.get('year')
     tiers_results = clstr.run_clustering(year)
     return json.dumps(tiers_results)
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)

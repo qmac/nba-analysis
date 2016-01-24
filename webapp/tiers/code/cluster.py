@@ -59,7 +59,7 @@ def clusters_to_json(player_clusters):
 
 def run_clustering(year):
     # Load data from CSV
-    df = pd.DataFrame.from_csv('tiers/data/advanced_stats_%s.csv' % (year))
+    df = pd.DataFrame.from_csv('webapp/tiers/data/advanced_stats_%s.csv' % (year))
 
     # Remove outliers
     df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
