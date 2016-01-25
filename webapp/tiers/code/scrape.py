@@ -6,6 +6,8 @@ import urllib2
 import numpy as np
 import pandas as pd
 
+from webapp import db
+
 def scrape_pictures(players):
     directory = 'static/pics/'
     if not os.path.exists(directory):

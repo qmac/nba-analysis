@@ -5,8 +5,8 @@ import json
 import pandas as pd
 import os
 
-import positions.code.classification as pos_classification
-import tiers.code.cluster as clstr
+from .positions.code import classification as pos_classification
+from .tiers.code import cluster as clstr
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
