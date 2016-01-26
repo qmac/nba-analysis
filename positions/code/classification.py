@@ -1,4 +1,7 @@
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 import pandas as pd
 import numpy as np
@@ -27,23 +30,31 @@ def predictions_to_json(predictions):
     seasons = [{'className': row[1]['season'], 'axes':[{'axis': axis, 'value': row[1][axis]} for axis in axes]} for row in predictions.iterrows()]
     return seasons
 
-def predict_positions(player_name):
+def pos_classify(player_name, algorithm):
+    # Load data from CSV
     df = pd.DataFrame.from_csv('positions/data/career_data.csv')
+
+    # Remove outliers and empty entries
     df = df[(df['gp'] > 58)]
     df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
 
-    # Run the classifier
-    clf = KNeighborsClassifier(n_neighbors=10)
+    # Set up training data
     training = df.drop(player_name)
 
+    # Initialize the classifier
+    clf = eval(algorithm)()
+    if algorithm == 'SVC':
+        clf.probability = True
+
+    # Perform classifier training
     clf.fit(training[FEATURE_COLUMNS], training[CLASS_COLUMN])
 
+    # Run the classifier
     player = df.loc[player_name]
-    #print clf.predict(player[FEATURE_COLUMNS])
-
     prediction_probabilities = clf.predict_proba(player[FEATURE_COLUMNS])
+
+    # Convert to JSON for frontend
     prediction_df = pd.DataFrame(prediction_probabilities, columns=['C', 'C-F', 'F', 'F-C', 'F-G', 'G', 'G-F'])
     prediction_df['season'] = np.array(player['season_id'])
-
     return predictions_to_json(prediction_df)
 

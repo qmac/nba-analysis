@@ -10,6 +10,12 @@ import json
 
 DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
 SIZE = 2000 # Size of tier bubbles
+FEATURE_COLUMNS = [
+                    'PIE', 
+                    'TS_PCT', 
+                    'NET_RATING', 
+                    'USG_PCT'
+                    ]
 
 # Elbow Method for determining k
 def plot_inertias(cluster_data):
@@ -36,19 +42,6 @@ def plot_silhouettes(cluster_data):
     plt.plot(silhouettes)
     plt.savefig('./../figures/silhouettes.png')
 
-def cluster(cluster_data):
-    clstr = KMeans(n_clusters=DEFAULT_K)
-    clstr.fit(cluster_data)
-    return clstr.labels_
-
-def cluster_agg(cluster_data):
-    clstr = AgglomerativeClustering(n_clusters=DEFAULT_K, linkage='ward')
-    clstr.fit(cluster_data)
-
-    df['tier'] = clstr.labels_
-    results = df[['PLAYER_NAME', 'tier']]
-    return results
-
 def clusters_to_json(player_clusters):
     players_dict = {}
     players_grouped = player_clusters.groupby('tier')
@@ -57,22 +50,22 @@ def clusters_to_json(player_clusters):
     print players_dict
     return players_dict
 
-def run_clustering(year):
+def cluster(year, algorithm):
     # Load data from CSV
     df = pd.DataFrame.from_csv('tiers/data/advanced_stats_%s.csv' % (year))
 
     # Remove outliers
     df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
 
-    feature_columns = [
-                    'PIE', 
-                    'TS_PCT', 
-                    'NET_RATING', 
-                    'USG_PCT'
-                    ]
-    fitting_data = df[feature_columns]
+    # Set up fitting data
+    fitting_data = df[FEATURE_COLUMNS]
     fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
 
-    df['tier'] = cluster(fitting_data)
+    # Run clustering
+    clstr = eval(algorithm)(n_clusters=DEFAULT_K)
+    clstr.fit(fitting_data)
+
+    # Convert results to JSON for frontend
+    df['tier'] = clstr.labels_
     clustered_players = df[['PLAYER_NAME', 'tier']]
     return clusters_to_json(clustered_players)
