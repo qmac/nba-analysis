@@ -5,13 +5,13 @@ import json
 import pandas as pd
 import os
 
-from .positions.code.classification import pos_classify
-from .tiers.code.cluster import cluster
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 db_engine = db.get_engine(app)
+
+from .positions.code.classification import pos_classify
+from .tiers.code.cluster import cluster
 
 @app.route('/')
 def index():

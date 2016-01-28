@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 
 import json
 
+from webapp import db_engine
+
 DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
 SIZE = 2000 # Size of tier bubbles
 FEATURE_COLUMNS = [
@@ -42,17 +44,21 @@ def plot_silhouettes(cluster_data):
     plt.plot(silhouettes)
     plt.savefig('./../figures/silhouettes.png')
 
+# Converts clusters into dictionary compatible for visualization
 def clusters_to_json(player_clusters):
     players_dict = {}
     players_grouped = player_clusters.groupby('tier')
     players_dict['name'] = 'vis'
     players_dict['children'] = map(lambda x:{'name':'Tier %d' % (x[0]), 'children':map(lambda x:{'name':x, 'size':SIZE}, x[1]['PLAYER_NAME'])}, players_grouped)
-    print players_dict
     return players_dict
 
+# Performs clustering
 def cluster(year, algorithm):
-    # Load data from CSV
-    df = pd.DataFrame.from_csv('webapp/tiers/data/advanced_stats_%s.csv' % (year))
+    # Load data from db
+    df = pd.read_sql('advanced_stats', db_engine)
+
+    # Filter by year
+    df = df[(df['YEAR'] == year)]
 
     # Remove outliers
     df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
@@ -60,6 +66,8 @@ def cluster(year, algorithm):
     # Set up fitting data
     fitting_data = df[FEATURE_COLUMNS]
     fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
+
+    print fitting_data
 
     # Run clustering
     clstr = eval(algorithm)(n_clusters=DEFAULT_K)
