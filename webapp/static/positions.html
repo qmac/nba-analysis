@@ -29,6 +29,13 @@
   <select id='players' onchange="drawCharts()">
     <option selected='selected'>Select a player</option>
   </select>
+  <select id='algorithms' onchange="drawCharts()">
+    <option selected='selected'>Select an algorithm</option>
+    <option>GaussianNB</option>
+    <option>SVC</option>
+    <option>KNeighborsClassifier</option>
+    <option>DecisionTreeClassifier</option>
+</select>
   <script type="text/javascript">
     RadarChart.defaultConfig.radius = 1;
 
@@ -45,12 +52,15 @@
       d3.selectAll(".chart").remove();
 
       // Get the player selected in the drop down
-      var d = document.getElementById('players');
-      var player = d.options[d.selectedIndex].text;
-      console.log(player);
+      var player_select = document.getElementById('players');
+      var player = player_select.options[player_select.selectedIndex].text;
+      
+      // Get the algorithm selected in the drop down
+      var alg_select = document.getElementById('algorithms');
+      var algorithm = alg_select.options[alg_select.selectedIndex].text;
 
       // Draw that player's radar chart
-      var url = "/_get_positions?player=" + player
+      var url = "/_get_positions?player=" + player + "&algorithm=" + algorithm;
       d3.json(url, function(data) {
         for (var i=0;i<data.length;i++) {
           var name = "chart" + data[i]["className"];
