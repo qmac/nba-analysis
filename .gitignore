@@ -1,6 +1,6 @@
 .DS_Store
 *.pyc
-*/data/*
+*.csv
 build
 dist
 nba_analysis.egg-info
