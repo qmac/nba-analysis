@@ -1,12 +1,13 @@
 import requests
 import csv
 import os
+import sys
 import urllib2
 
 import numpy as np
 import pandas as pd
 
-from webapp import db
+from webapp import db_engine
 
 def scrape_pictures(players):
     directory = 'static/pics/'
@@ -37,39 +38,41 @@ def scrape_pictures(players):
         except:
             continue
 
-def write_to_csv(path, data):
-    with open(path, 'a+') as db:
-        writer = csv.writer(db, delimiter=',')
-        writer.writerows(data)
+def scrape_advanced(years):
+    YEARS = ['2014-15', '2015-16']
+    dfs = []
+    for year in YEARS:
+        # URL
+        stats_url = 'http://stats.nba.com/stats/leaguedashplayerstats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&'\
+        'DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&'\
+        'OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&'\
+        'Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&'\
+        'VsDivision=&Weight=' % (year)
 
-if not os.path.exists('tiers/data/'):
-    os.makedirs('tiers/data/')
+        # Scrape
+        response_json = requests.get(stats_url).json()
+        headers = response_json['resultSets'][0]['headers']
+        data = response_json['resultSets'][0]['rowSet']
 
-YEARS = ['2014-15', '2015-16']
-for year in YEARS:
-    path = 'tiers/data/advanced_stats_%s.csv' % (year)
+        # Manually add year data
+        headers.append('YEAR')
+        for row in data:
+            row.append(year)
 
-    # Delete file if already exists
-    try:
-        os.remove(path)
-    except OSError:
-        pass
+        # Write into database
+        df = pd.DataFrame(data=data, columns=headers)
+        dfs.append(df)
 
-    # URL
-    stats_url = 'http://stats.nba.com/stats/leaguedashplayerstats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&'\
-    'DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&'\
-    'OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&'\
-    'Rank=N&Season=%s&SeasonSegment=&SeasonType=Regular+Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&'\
-    'VsDivision=&Weight=' % (year)
+    table = pd.concat(dfs)
+    table.to_sql('advanced_stats', db_engine, if_exists='replace')
+    print 'Finished updating advanced stats in db'
+    return
 
-    # Scrape
-    response_json = requests.get(stats_url).json()
-    headers = response_json['resultSets'][0]['headers']
-    data = response_json['resultSets'][0]['rowSet']
-    write_to_csv(path, [headers])
-    write_to_csv(path, data)
+# scrape_pictures(players)
 
-df_2014 = pd.DataFrame.from_csv('tiers/data/advanced_stats_2014-15.csv')
-df_2015 = pd.DataFrame.from_csv('tiers/data/advanced_stats_2015-16.csv')
-players = np.append(np.array(df_2014['PLAYER_NAME']), np.array(df_2015['PLAYER_NAME']))
-scrape_pictures(players)
+if __name__ == '__main__':
+    if len(sys.argv) != 1:
+        print 'Usage: python scrape.py'
+        exit(-1)
+    
+    scrape_advanced()
