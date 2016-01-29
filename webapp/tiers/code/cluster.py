@@ -15,7 +15,7 @@ SIZE = 2000 # Size of tier bubbles
 FEATURE_COLUMNS = [
                     'PIE', 
                     'TS_PCT', 
-                    'NET_RATING', 
+                    #'NET_RATING', 
                     'USG_PCT'
                     ]
 
@@ -65,9 +65,7 @@ def cluster(year, algorithm):
 
     # Set up fitting data
     fitting_data = df[FEATURE_COLUMNS]
-    fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
-
-    print fitting_data
+    fitting_data = (fitting_data - fitting_data.min()) / (fitting_data.max() - fitting_data.min())
 
     # Run clustering
     clstr = eval(algorithm)(n_clusters=DEFAULT_K)
