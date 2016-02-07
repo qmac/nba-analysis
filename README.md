@@ -21,13 +21,15 @@ Sources
 * [NBA Stats (scraped)] (http://stats.nba.com/)
 
 
-Libraries
+Getting Started
 -------------------
-
 All of the needed libraries can be installed using `pip install -r requirements.txt` in the repository directory.
+
+Install the package using `python setup.py install`.
+
+To run the web app, run `python runserver.py` and point your browser to `http://localhost:5000/`.
 
 
 Disclaimer
 -------------------
-
 All of these experiments/mini-projects are more for proof-of-concept and practice than true analysis. The analysis is rudimentary and the scikit-learn algorithms used could be tuned much further by manipulating parameters.
