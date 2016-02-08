@@ -7,10 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import json
+import math
 
 from webapp import db_engine
 
-DEFAULT_K = 11 # Rule of thumb k (k=sqrt(n/2))
 SIZE = 2000 # Size of tier bubbles
 FEATURE_COLUMNS = [
                     'PIE', 
@@ -18,6 +18,11 @@ FEATURE_COLUMNS = [
                     #'NET_RATING', 
                     'USG_PCT'
                     ]
+TIER_NAMES = [
+            'MVPs', 'All-Stars', 'Key Starters', 'Starters', 
+            'Starters', '6th Men', 'Role Players', 'Role Players', 
+            'Role Players', 'Bench Warmers', 'Scrubs'
+            ]
 
 # Elbow Method for determining k
 def plot_inertias(cluster_data):
@@ -46,10 +51,12 @@ def plot_silhouettes(cluster_data):
 
 # Converts clusters into dictionary compatible for visualization
 def clusters_to_json(player_clusters):
-    players_dict = {}
     players_grouped = player_clusters.groupby('tier')
+    tiers_dict = players_grouped.mean().sum(axis=1).rank(ascending=False) - 1
+    
+    players_dict = {}
     players_dict['name'] = 'vis'
-    players_dict['children'] = map(lambda x:{'name':'Tier %d' % (x[0]), 'children':map(lambda x:{'name':x, 'size':SIZE}, x[1]['PLAYER_NAME'])}, players_grouped)
+    players_dict['children'] = map(lambda x:{'name':TIER_NAMES[int(tiers_dict[int(x[0])])], 'children':map(lambda x:{'name':x, 'size':SIZE}, x[1]['name'])}, players_grouped)
     return players_dict
 
 # Performs clustering
@@ -64,14 +71,18 @@ def cluster(year, algorithm):
     df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
 
     # Set up fitting data
-    fitting_data = df[FEATURE_COLUMNS]
-    fitting_data = (fitting_data - fitting_data.min()) / (fitting_data.max() - fitting_data.min())
+    names = df['PLAYER_NAME']
+    df = df[FEATURE_COLUMNS]
+    df = (df - df.min()) / (df.max() - df.min())
+
+    # Rule of thumb k (k=sqrt(n/2))
+    num_clusters = int(math.sqrt(len(df)/2))
 
     # Run clustering
-    clstr = eval(algorithm)(n_clusters=DEFAULT_K)
-    clstr.fit(fitting_data)
+    clstr = eval(algorithm)(n_clusters=num_clusters)
+    clstr.fit(df)
 
     # Convert results to JSON for frontend
     df['tier'] = clstr.labels_
-    clustered_players = df[['PLAYER_NAME', 'tier']]
-    return clusters_to_json(clustered_players)
+    df['name'] = names
+    return clusters_to_json(df)
