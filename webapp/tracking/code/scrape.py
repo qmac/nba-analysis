@@ -29,7 +29,7 @@ def worker():
 def fetch_url(url):
     csv_data = []
     try:
-        response_json = requests.get(url).json()
+        response_json = requests.get(url, headers={'user-agent': 'Mozilla/5.0', 'referer': 'http://stats.nba.com/scores/'}).json()
         moments = response_json["moments"]
         home_team = response_json["home"]["abbreviation"]
         away_team = response_json["visitor"]["abbreviation"]

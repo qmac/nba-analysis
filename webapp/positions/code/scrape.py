@@ -4,7 +4,7 @@ import os
 
 def scrape(url):
     try:
-        response_json = requests.get(url).json()
+        response_json = requests.get(url, headers={'user-agent': 'Mozilla/5.0', 'referer': 'http://stats.nba.com/scores/'}).json()
         data = response_json["resultSets"][0]["rowSet"]
         return data
     except:
