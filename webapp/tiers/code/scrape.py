@@ -15,7 +15,7 @@ def scrape_advanced(years):
         'VsDivision=&Weight=' % (year)
 
         # Scrape
-        response_json = requests.get(stats_url).json()
+        response_json = requests.get(stats_url, headers={'user-agent': 'Mozilla/5.0', 'referer': 'http://stats.nba.com/scores/'}).json()
         headers = response_json['resultSets'][0]['headers']
         data = response_json['resultSets'][0]['rowSet']
 
