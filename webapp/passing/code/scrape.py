@@ -16,7 +16,7 @@ def write_to_csv(data):
 def scrape_passing():
     # Delete file if already exists
     try:
-        os.remove('data/passing_data.csv')
+        os.remove('../data/passing_data.csv')
     except OSError:
         pass
 

@@ -87,10 +87,10 @@ def simulate_possession(g, df, prev, curr, path):
 def visualize(g):
     from networkx.drawing.nx_pydot import write_dot
     nx.draw_graphviz(g)
-    write_dot(g,'figures/passing_graph.dot')
+    write_dot(g,'../figures/passing_graph.dot')
 
 def main(args):
-    df = pd.read_csv('data/passing_data.csv', index_col=False)
+    df = pd.read_csv('../data/passing_data.csv', index_col=False)
     df = df[(df['TEAM_NAME'] == args[1])]
 
     g = construct_graph(df)
