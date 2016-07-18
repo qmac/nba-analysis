@@ -41,23 +41,41 @@
       var url = '/_get_tiers?year=' + year + '&algorithm=' + algorithm;
 
       var encodedName = function(player_name) {
-        if(player_name.indexOf('Tier') > -1 || player_name === 'vis') {
-          return;
+        var tiers = [
+            'MVPs', 'All-Stars', 'Key Starters', 'Starters', 
+            'Starters', '6th Men', 'Role Players', 'Role Players', 
+            'Role Players', 'Bench Warmers', 'Scrubs', 'Undefined'
+            ]
+        if(tiers.indexOf(player_name) > -1 || player_name === 'vis') {
+          return '';
         }
-        if(player_name === 'Nene Hilario') {
-          return 'nene';
+        switch (player_name) {
+          case 'Nene Hilario':
+            player_name = 'nene';
+            break;
+          case 'Tim Hardaway':
+            player_name = 'tim_hardaway_jr';
+            break;
+          case 'Jose Juan Barea':
+            player_name = 'jose_barea';
+            break;
+          case 'Kelly Oubre':
+            player_name = 'default_nba_headshot_v2';
+            break;
+          case 'Larry Nance Jr.':
+            player_name = 'larry_nance';
+            break;
         }
-        if(player_name === 'Tim Hardaway') {
-          return 'tim_hardaway_jr';
-        }
-        if(player_name === 'Jose Juan Barea') {
-          return 'jose_barea';
-        }
+
         return player_name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '').replace('\'', ''); 
       }
 
       var filePath = function(player_name) {
-        return 'http://i.cdn.turner.com/nba/nba/.element/img/2.0/sect/statscube/players/large/' + encodedName(player_name) + '.png';
+        var encoded = encodedName(player_name)
+        if(encoded === '') {
+          return;
+        }
+        return 'http://i.cdn.turner.com/nba/nba/.element/img/2.0/sect/statscube/players/large/' + encoded + '.png';
       }
 
       var margin = 10,
