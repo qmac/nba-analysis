@@ -32,7 +32,7 @@ def predictions_to_json(predictions):
 
 def pos_classify(player_name, algorithm):
     # Load data from CSV
-    df = pd.DataFrame.from_csv('positions/data/career_data.csv')
+    df = pd.DataFrame.from_csv('webapp/positions/data/career_data.csv')
 
     # Remove outliers and empty entries
     df = df[(df['gp'] > 58)]

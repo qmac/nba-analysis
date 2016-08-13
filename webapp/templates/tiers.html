@@ -1,5 +1,9 @@
-<!DOCTYPE html>
-<meta charset='utf-8'>
+{% extends "bootstrap/base.html" %}
+{% block title %}NBA Analysis{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
 <head>
   <style>
 
@@ -196,3 +200,4 @@
   </div>
   <div id='display'/>
 </body>
+{% endblock %}

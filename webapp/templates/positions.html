@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html>
-<meta charset="utf-8">
+{% extends "bootstrap/base.html" %}
+{% block title %}NBA Analysis{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
 <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
 <link rel="stylesheet" href="static/radar/radar-chart.css">
 <head>
   <style>
-    body {
-      padding: 20px;
-    }
     .radar-chart .area {
       fill-opacity: 0.7;
       fill: #ADD8E6;
@@ -73,4 +73,4 @@
     }
   </script>
 </body>
-</html>
+{% endblock %}

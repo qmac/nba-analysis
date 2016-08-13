@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_bootstrap import Bootstrap
 
 import json
 import pandas as pd
 import os
 
 app = Flask(__name__)
+Bootstrap(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 db_engine = db.get_engine(app)
@@ -15,15 +17,15 @@ from .tiers.code.cluster import cluster
 
 @app.route('/')
 def index():
-    return "HI"
+    return render_template('home.html')
 
 @app.route('/tiers')
 def tiers():
-    return app.send_static_file('tiers.html')
+    return render_template('tiers.html')
 
 @app.route('/positions')
 def positions():
-    return app.send_static_file('positions.html')
+    return render_template('positions.html')
 
 @app.route('/_get_all_names')
 def get_all_names():
