@@ -23,19 +23,6 @@
   <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
   <script type="text/javascript" src="static/radar/radar-chart.js"></script>
-</head>
-<body onload='getPlayers()' id='body'>
-  <h1>Positions Radar Chart</h1>
-  <select id='players' onchange="drawCharts()">
-    <option selected='selected'>Select a player</option>
-  </select>
-  <select id='algorithms' onchange="drawCharts()">
-    <option selected='selected'>Select an algorithm</option>
-    <option>GaussianNB</option>
-    <option>SVC</option>
-    <option>KNeighborsClassifier</option>
-    <option>DecisionTreeClassifier</option>
-</select>
   <script type="text/javascript">
     RadarChart.defaultConfig.radius = 1;
 
@@ -64,7 +51,7 @@
       d3.json(url, function(data) {
         for (var i=0;i<data.length;i++) {
           var name = "chart" + data[i]["className"];
-          d3.select("body").append("div").attr("id", name).attr("class", "chart");
+          d3.select("#results").append("div").attr("id", name).attr("class", "chart");
 
           var arr = [data[i]];
           RadarChart.draw("#"+name, arr);
@@ -72,5 +59,28 @@
       });
     }
   </script>
+</head>
+<body onload='getPlayers()'>
+  <div class='row' style="padding-left:10px;">
+      <div class="col-sm-3">
+        <h4>
+          Settings
+        </h4>
+        <div class='input-group' style='padding-bottom:5px;'>
+          <select class='form-control' id='players'>
+            <option selected='selected'>Select a player</option>
+          </select>
+          <select class='form-control' id='algorithms'>
+            <option selected='selected'>Select an algorithm</option>
+            <option>GaussianNB</option>
+            <option>SVC</option>
+            <option>KNeighborsClassifier</option>
+            <option>DecisionTreeClassifier</option>
+          </select>
+        </div>
+        <button class='btn btn-primary' onclick='drawCharts()'>Run Analysis</button>
+      </div>
+      <div class="col-sm-6" id='results'/>
+  </div>
 </body>
 {% endblock %}
