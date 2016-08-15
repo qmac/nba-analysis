@@ -61,26 +61,28 @@
   </script>
 </head>
 <body onload='getPlayers()'>
-  <div class='row' style="padding-left:10px;">
-      <div class="col-sm-3">
-        <h4>
-          Settings
-        </h4>
-        <div class='input-group' style='padding-bottom:5px;'>
-          <select class='form-control' id='players'>
-            <option selected='selected'>Select a player</option>
-          </select>
-          <select class='form-control' id='algorithms'>
-            <option selected='selected'>Select an algorithm</option>
-            <option>GaussianNB</option>
-            <option>SVC</option>
-            <option>KNeighborsClassifier</option>
-            <option>DecisionTreeClassifier</option>
-          </select>
+  <div class='container-fluid'>
+    <div class='row'>
+        <div class="col-sm-3">
+          <h4>
+            Settings
+          </h4>
+          <div class='input-group' style='padding-bottom:5px;'>
+            <select class='form-control' id='players'>
+              <option selected='selected'>Select a player</option>
+            </select>
+            <select class='form-control' id='algorithms'>
+              <option selected='selected'>Select an algorithm</option>
+              <option>GaussianNB</option>
+              <option>SVC</option>
+              <option>KNeighborsClassifier</option>
+              <option>DecisionTreeClassifier</option>
+            </select>
+          </div>
+          <button class='btn btn-primary' onclick='drawCharts()'>Run Analysis</button>
         </div>
-        <button class='btn btn-primary' onclick='drawCharts()'>Run Analysis</button>
-      </div>
-      <div class="col-sm-6" id='results'/>
+        <div class="col-sm-6" id='results'/>
+    </div>
   </div>
 </body>
 {% endblock %}

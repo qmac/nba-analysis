@@ -186,24 +186,26 @@
   </script>
 </head>
 <body>
-  <div class='row' style="padding-left:10px;">
-    <div class="col-sm-3">
-      <h4>
-        Settings
-      </h4>
-      <div class='input-group' style='padding-bottom:5px;'>
-        <select class='form-control' id='years'>
-          <option>2014-15</option>
-          <option>2015-16</option>
-        </select>
-        <select class='form-control' id='algorithms'>
-          <option>KMeans</option>
-          <option>AgglomerativeClustering</option>
-        </select>
+  <div class="container-fluid">
+    <div class='row'>
+      <div class="col-sm-3">
+        <h4>
+          Settings
+        </h4>
+        <div class='input-group' style='padding-bottom:5px;'>
+          <select class='form-control' id='years'>
+            <option>2014-15</option>
+            <option>2015-16</option>
+          </select>
+          <select class='form-control' id='algorithms'>
+            <option>KMeans</option>
+            <option>AgglomerativeClustering</option>
+          </select>
+        </div>
+        <button class='btn btn-primary' onclick='drawTiers()'>Run Analysis</button>
       </div>
-      <button class='btn btn-primary' onclick='drawTiers()'>Run Analysis</button>
+      <div class="col-sm-6" id='display'/>
     </div>
-    <div class="col-sm-6" id='display'/>
   </div>
 </body>
 {% endblock %}
