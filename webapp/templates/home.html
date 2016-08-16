@@ -1,0 +1,40 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}NBA Analysis{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
+  <div class='container-fluid'>
+    <h2>
+      Welcome to NBA Analysis
+    </h2>
+    <div class='row'>
+      <div class='col-lg-4'>
+        <img src='./static/images/figure1.png' alt='Placeholder' width='320' height='240'>
+        <h2>Data analysis</h2>
+        <p>Use supervised and unsupervised learning <a href='http://scikit-learn.org/'>algorithms</a> to uncover 
+        patterns in NBA statistics. Utilize top navigation bar to traverse current analytic capabilities.</p>
+        <p><a class='btn btn-default' href='./tiers' role='button'>See more &raquo;</a></p>
+      </div>
+      <div class='col-lg-4'>
+        <img src='./static/images/figure2.png' alt='Placeholder' width='350' height='240'>
+        <h2>Visualizations</h2>
+        <p>Provides informative visualizations of analysis results using <a href='https://d3js.org/'>D3.</a>
+        Most visualizations are interactive and allow user to best understand results.</p>
+        <p><a class='btn btn-default' href='./tiers' role='button'>See more &raquo;</a></p>
+      </div>
+      <div class='col-lg-4'>
+        <img src='./static/images/figure3.png' alt='Placeholder' width='240' height='240'>
+        <h2>Real time</h2>
+        <p>Conducts analysis on the fly at the push of a button. User can experiment with different 
+        algorithms and settings without dealing with code.</p>
+        <p><a class='btn btn-default' href='./positions' role='button'>See more &raquo;</a></p>
+      </div>
+    </div>
+    <div align='center'>
+      <footer style='padding-top:50px'>
+        <p>Created by Quinn McNamara  &middot; <a href='https://github.com/qmac/nba-analysis'>Github</a></p>
+      </footer>
+    </div>
+  </div>
+{% endblock %}

@@ -1,8 +1,11 @@
-<!DOCTYPE html>
-<meta charset='utf-8'>
+{% extends 'bootstrap/base.html' %}
+{% block title %}NBA Analysis{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
 <head>
   <style>
-
   .node {
     cursor: pointer;
   }
@@ -91,11 +94,11 @@
           .size([diameter - margin, diameter - margin])
           .value(function(d) { return d.size; })
 
-      var tooltip = d3.select("#display")
-        .append("div")
-        .attr("id", "tooltip")
-        .style("position", "absolute")
-        .text("Tiers of NBA Players");
+      var tooltip = d3.select('#display')
+        .append('div')
+        .attr('id', 'tooltip')
+        .style('position', 'absolute')
+        .text('Tiers of NBA Players');
 
       var svg = d3.select('#display').append('svg')
           .attr('width', diameter)
@@ -183,16 +186,26 @@
   </script>
 </head>
 <body>
-  <div>
-    <select id='years'>
-      <option>2014-15</option>
-      <option>2015-16</option>
-    </select>
-    <select id='algorithms'>
-      <option>KMeans</option>
-      <option>AgglomerativeClustering</option>
-    </select>
-    <button onclick="drawTiers()">Go</button>
+  <div class='container-fluid'>
+    <div class='row'>
+      <div class='col-sm-3'>
+        <h4>
+          Settings
+        </h4>
+        <div class='input-group' style='padding-bottom:5px;'>
+          <select class='form-control' id='years'>
+            <option>2014-15</option>
+            <option>2015-16</option>
+          </select>
+          <select class='form-control' id='algorithms'>
+            <option>KMeans</option>
+            <option>AgglomerativeClustering</option>
+          </select>
+        </div>
+        <button class='btn btn-primary' onclick='drawTiers()'>Run Analysis</button>
+      </div>
+      <div class='col-sm-6' id='display'/>
+    </div>
   </div>
-  <div id='display'/>
 </body>
+{% endblock %}
