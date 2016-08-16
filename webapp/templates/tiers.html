@@ -1,4 +1,4 @@
-{% extends "bootstrap/base.html" %}
+{% extends 'bootstrap/base.html' %}
 {% block title %}NBA Analysis{% endblock %}
 
 {% include 'navbar.html' %}
@@ -94,11 +94,11 @@
           .size([diameter - margin, diameter - margin])
           .value(function(d) { return d.size; })
 
-      var tooltip = d3.select("#display")
-        .append("div")
-        .attr("id", "tooltip")
-        .style("position", "absolute")
-        .text("Tiers of NBA Players");
+      var tooltip = d3.select('#display')
+        .append('div')
+        .attr('id', 'tooltip')
+        .style('position', 'absolute')
+        .text('Tiers of NBA Players');
 
       var svg = d3.select('#display').append('svg')
           .attr('width', diameter)
@@ -186,9 +186,9 @@
   </script>
 </head>
 <body>
-  <div class="container-fluid">
+  <div class='container-fluid'>
     <div class='row'>
-      <div class="col-sm-3">
+      <div class='col-sm-3'>
         <h4>
           Settings
         </h4>
@@ -204,7 +204,7 @@
         </div>
         <button class='btn btn-primary' onclick='drawTiers()'>Run Analysis</button>
       </div>
-      <div class="col-sm-6" id='display'/>
+      <div class='col-sm-6' id='display'/>
     </div>
   </div>
 </body>
