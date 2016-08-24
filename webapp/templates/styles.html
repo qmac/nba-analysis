@@ -1,109 +1,124 @@
-<html>
-  <head>
-  <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
-  <style>
-    body {
-      margin: 0px;
-      padding: 0px;
-      font: 12px Arial;
-    }
-  </style>
-  </head>
-  <body>
-    <script type='text/javascript'>
+{% extends 'bootstrap/base.html' %}
+{% block title %}NBA Analysis{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
+<head>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
+  <script type=text/javascript>
     //height of each row in the heatmap
     var h = 20;
     //width of each column in the heatmap
-    var w = 100;
+    var w = 75;
 
-    var url = '/_get_styles';
-    var results = d3.json(url, function(results) {
-      console.log(results);
-      //attach a SVG node to the document
-      //height and width defined by the row/column lengths
-      var mySVG = d3.select('body')
-        .append('svg')
-        .attr('width', (w * results['cols'].length) + 400) 
-        .attr('height', (h * results['rows'].length + 100))
-        .style('position','absolute')
-        .style('top',0)
-        .style('left',0);
+    function drawHeatmap() {
+      // Get the algorithm selected in the drop down
+      var scope_select = document.getElementById('scope');
+      var scope = scope_select.options[scope_select.selectedIndex].text;
 
-      //define a color scale using the min and max expression values
-      var colorScale = d3.scale.linear()
-        .domain([results['min'], 0, results['max']])
-        .range(['blue', 'white', 'red']);
+      var url = '/_get_styles?scope=' + scope;
+      var results = d3.json(url, function(results) {
+        //attach a SVG node to the document
+        //height and width defined by the row/column lengths
+        var mySVG = d3.select('#display')
+          .append('svg')
+          .attr('width', (w * results['cols'].length) + 100) 
+          .attr('height', (h * results['rows'].length + 100))
+          .style('position','absolute');
 
-      //generate the heatmap
-      var heatmapRow = mySVG.selectAll('.heatmap')
-        .data(results['data'])
-        .enter().append('g');
+        //define a color scale using the min and max expression values
+        var colorScale = d3.scale.linear()
+          .domain([results['min'], 0, results['max']])
+          .range(['blue', 'white', 'red']);
 
-      var heatmapRects = heatmapRow
-          .selectAll('.rect')
-          .data(function(d) {
-            return d;
-          }).enter().append('svg:rect')
-          .attr('width',w)
-          .attr('height',h)
-          .attr('x', function(d) {
-            return (d[2] * w) + 25;
+        //generate the heatmap
+        var heatmapRow = mySVG.selectAll('.heatmap')
+          .data(results['data'])
+          .enter().append('g');
+
+        var heatmapRects = heatmapRow
+            .selectAll('.rect')
+            .data(function(d) {
+              return d;
+            }).enter().append('svg:rect')
+            .attr('width',w)
+            .attr('height',h)
+            .attr('x', function(d) {
+              return (d[2] * w) + 25;
+            })
+            .attr('y', function(d) {
+              return (d[1] * h) + 50;
+            })
+            .style('fill',function(d) {
+              return colorScale(d[0]);
+            });
+
+        //label columns
+        var columnLabel = mySVG.selectAll('.colLabel')
+          .data(results['cols'])
+          .enter().append('svg:text')
+          .attr('x', function(d,i) {
+            return ((i + 0.5) * w) + 25;
           })
-          .attr('y', function(d) {
-            return (d[1] * h) + 50;
+          .attr('y', 30)
+          .attr('class','label')
+          .style('text-anchor','middle')
+          .text(function(d) {return d;});
+
+        //expression value label
+        var expLab = d3.select('#display')
+          .append('div')
+          .style('height',23)
+          .style('position','absolute')
+          .style('background','FFE53B')
+          .style('opacity',0.8)
+          .style('left',20)
+          .style('display','none');
+
+        //heatmap mouse events
+        heatmapRow
+          .on('mouseover', function(d,i) {
+            d3.select(this)
+              .attr('stroke-width',1)
+              .attr('stroke','black')
+
+              output = '<b>' + results['rows'][i] + '</b><br>';
+
+              expLab
+                .style('top',((i+1) * h) + 30)
+                .style('display','block')
+                .html(output);
           })
-          .style('fill',function(d) {
-            return colorScale(d[0]);
-          });
-
-      //label columns
-      var columnLabel = mySVG.selectAll('.colLabel')
-        .data(results['cols'])
-        .enter().append('svg:text')
-        .attr('x', function(d,i) {
-          return ((i + 0.5) * w) + 25;
-        })
-        .attr('y', 30)
-        .attr('class','label')
-        .style('text-anchor','middle')
-        .text(function(d) {return d;});
-
-      //expression value label
-      var expLab = d3.select('body')
-        .append('div')
-        .style('height',23)
-        .style('position','absolute')
-        .style('background','FFE53B')
-        .style('opacity',0.8)
-        .style('left',20)
-        .style('display','none');
-
-      //heatmap mouse events
-      heatmapRow
-        .on('mouseover', function(d,i) {
-          d3.select(this)
-            .attr('stroke-width',1)
-            .attr('stroke','black')
-
-            output = '<b>' + results['rows'][i] + '</b><br>';
-            for (var j = 0 , count = results['data'][i].length; j < count; j ++ ) {
-              output += results['data'][i][j][0] + ', ';
-            }
+          .on('mouseout', function(d,i) {
+            d3.select(this)
+              .attr('stroke-width',0)
+              .attr('stroke','none')
 
             expLab
-              .style('top',((i+1) * h))
-              .style('display','block')
-              .html(output.substring(0,output.length - 3));
-        })
-        .on('mouseout', function(d,i) {
-          d3.select(this)
-            .attr('stroke-width',0)
-            .attr('stroke','none')
-
-          expLab
-            .style('display','none')
-        });
+              .style('display','none')
+          });
       });
-   </script>
-  </body>
-</html>
+    }
+  </script>
+</head>
+<body>
+  <div class='container-fluid'>
+    <div class='row'>
+      <div class='col-sm-2'>
+        <h4>
+          Settings
+        </h4>
+        <div class='input-group' style='padding-bottom:5px;width:150px;'>
+          <select class='form-control' id='scope'>
+            <option>Player</option>
+            <option>Team</option>
+          </select>
+        </div>
+        <button class='btn btn-primary' onclick='drawHeatmap()'>Run Analysis</button>
+      </div>
+      <div class='col-sm-6' id='display'/>
+    </div>
+  </div>
+</body>
+{% endblock %}

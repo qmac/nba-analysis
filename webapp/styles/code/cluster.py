@@ -1,5 +1,4 @@
 from sklearn.cluster import AffinityPropagation
-from sklearn.cluster import DBSCAN
 
 import pandas as pd
 import numpy as np
