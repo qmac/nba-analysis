@@ -11,10 +11,9 @@ def clusters_to_json(index, df, labels):
     results = {}
     results['cols'] = ['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
             'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound']
-    results['min'] = 0.0
-    results['max'] = 50.0
+    results['min'] = df.min().min()
+    results['max'] = df.max().min()
     results['rows'] = index.tolist()
-    print index.tolist()
 
     data = []
     row = 0
@@ -38,11 +37,15 @@ def cluster():
 
     # Run clustering
     clstr = AffinityPropagation()
-    clstr.fit(team_df.drop('Team', 1))
-    team_df['cluster'] = clstr.labels_
-    team_df = team_df.sort('cluster')
-    teams = team_df['Team']
-    team_df = team_df.drop(['Team', 'cluster'], 1)
+    fitting_data = team_df.drop('Team', 1)
+    fitting_data = (fitting_data - fitting_data.mean()) / (fitting_data.max() - fitting_data.min())
+    clstr.fit(fitting_data)
+
+    fitting_data['cluster'] = clstr.labels_
+    fitting_data['teams'] = team_df['Team']
+    fitting_data = fitting_data.sort('cluster')
+    teams = fitting_data['teams']
+    fitting_data = fitting_data.drop(['teams', 'cluster'], 1)
 
     # Convert results to JSON for frontend
-    return clusters_to_json(teams, team_df, clstr.labels_)
+    return clusters_to_json(teams, fitting_data, clstr.labels_)
