@@ -56,5 +56,7 @@ def get_tiers():
 
 @app.route('/_get_styles')
 def get_styles():
-    results = style_cluster()
+    scope = request.args.get('scope')
+
+    results = style_cluster(scope)
     return json.dumps(results)

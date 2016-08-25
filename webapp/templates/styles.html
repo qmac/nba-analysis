@@ -13,7 +13,10 @@
     var w = 75;
 
     function drawHeatmap() {
-      // Get the algorithm selected in the drop down
+      // Remove the previous svg
+      d3.select('svg').remove();
+
+      // Get the scope selected in the drop down
       var scope_select = document.getElementById('scope');
       var scope = scope_select.options[scope_select.selectedIndex].text;
 
