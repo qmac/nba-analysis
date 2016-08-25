@@ -7,6 +7,8 @@
 <head>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
   <script type=text/javascript>
+    // Code adopted from http://blog.nextgenetics.net/demo/entry0044/
+
     //height of each row in the heatmap
     var h = 20;
     //width of each column in the heatmap
@@ -26,7 +28,7 @@
         //height and width defined by the row/column lengths
         var mySVG = d3.select('#display')
           .append('svg')
-          .attr('width', (w * results['cols'].length) + 100) 
+          .attr('width', (w * results['cols'].length) + 150) 
           .attr('height', (h * results['rows'].length + 100))
           .style('position','absolute');
 
@@ -48,7 +50,7 @@
             .attr('width',w)
             .attr('height',h)
             .attr('x', function(d) {
-              return (d[2] * w) + 25;
+              return (d[2] * w) + 125;
             })
             .attr('y', function(d) {
               return (d[1] * h) + 50;
@@ -62,9 +64,21 @@
           .data(results['cols'])
           .enter().append('svg:text')
           .attr('x', function(d,i) {
-            return ((i + 0.5) * w) + 25;
+            return ((i + 0.5) * w) + 125;
           })
-          .attr('y', 30)
+          .attr('y', 40)
+          .attr('class','label')
+          .style('text-anchor','middle')
+          .text(function(d) {return d;});
+
+        //label rows
+        var rowLabel = mySVG.selectAll('.rowLabel')
+          .data(results['rows'])
+          .enter().append('svg:text')
+          .attr('x', 65)
+          .attr('y', function(d, i) {
+            return ((i + 0.5) * h) + 52;
+          })
           .attr('class','label')
           .style('text-anchor','middle')
           .text(function(d) {return d;});
@@ -80,16 +94,18 @@
           .style('display','none');
 
         //heatmap mouse events
-        heatmapRow
-          .on('mouseover', function(d,i) {
+        heatmapRects
+          .on('mouseover', function(d) {
+            console.log(d);
             d3.select(this)
               .attr('stroke-width',1)
               .attr('stroke','black')
 
-              output = '<b>' + results['rows'][i] + '</b><br>';
+              output = '<b>' + results['data'][d[1]][d[2]][0] + '</b><br>';
 
               expLab
-                .style('top',((i+1) * h) + 30)
+                .style('top',((d[1]+1) * h) + 30)
+                .style('left', ((d[2]) * w) + 125)
                 .style('display','block')
                 .html(output);
           })
