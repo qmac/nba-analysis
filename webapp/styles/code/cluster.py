@@ -1,8 +1,8 @@
 from sklearn.cluster import AffinityPropagation
-
 import pandas as pd
-
 import json
+
+from webapp import db_engine
 
 FEATURES = ['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
             'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound']
@@ -35,7 +35,7 @@ def clusters_to_json(df, scope):
 # Performs clustering
 def cluster(scope):
     # Setup data
-    df = pd.read_csv('webapp/styles/code/playtype_data.csv')
+    df = pd.read_sql('playtype_data', db_engine)
 
     # Manipulate data into scope
     if scope == 'Team':
