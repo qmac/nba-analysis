@@ -13,7 +13,8 @@ db = SQLAlchemy(app)
 db_engine = db.get_engine(app)
 
 from .positions.code.classification import pos_classify
-from .tiers.code.cluster import cluster
+from .tiers.code.cluster import cluster as tier_cluster
+from .styles.code.cluster import cluster as style_cluster
 
 @app.route('/')
 def index():
@@ -26,6 +27,10 @@ def tiers():
 @app.route('/positions')
 def positions():
     return render_template('positions.html')
+
+@app.route('/styles')
+def styles():
+    return render_template('styles.html')
 
 @app.route('/_get_all_names')
 def get_all_names():
@@ -46,6 +51,12 @@ def get_tiers():
     year = request.args.get('year')
     algorithm = request.args.get('algorithm')
 
-    results = cluster(year, algorithm)
+    results = tier_cluster(year, algorithm)
     return json.dumps(results)
 
+@app.route('/_get_styles')
+def get_styles():
+    scope = request.args.get('scope')
+
+    results = style_cluster(scope)
+    return json.dumps(results)

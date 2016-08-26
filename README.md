@@ -9,6 +9,8 @@ Summary
 
 **shots**: classifying shot make/miss using a Naive Bayes classifier on shot data from the 2014-2015 NBA season for a given player
 
+**styles**: clustering NBA teams and players based on their play styles determined by the frequencies of play types
+
 **tiers**: clustering NBA players into tiers using the k-means clustering algorithm on advanced statistics
 
 **tracking**: visualization of ball tracking data scraped from stats.nba.com

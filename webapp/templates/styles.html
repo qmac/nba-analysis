@@ -1,0 +1,143 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}NBA Analysis{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
+<head>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
+  <script type=text/javascript>
+    // Code adopted from http://blog.nextgenetics.net/demo/entry0044/
+
+    //height of each row in the heatmap
+    var h = 20;
+    //width of each column in the heatmap
+    var w = 75;
+
+    function drawHeatmap() {
+      // Remove the previous svg
+      d3.select('svg').remove();
+
+      // Get the scope selected in the drop down
+      var scope_select = document.getElementById('scope');
+      var scope = scope_select.options[scope_select.selectedIndex].text;
+
+      var url = '/_get_styles?scope=' + scope;
+      var results = d3.json(url, function(results) {
+        //attach a SVG node to the document
+        //height and width defined by the row/column lengths
+        var mySVG = d3.select('#display')
+          .append('svg')
+          .attr('width', (w * results['cols'].length) + 150) 
+          .attr('height', (h * results['rows'].length + 100))
+          .style('position','absolute');
+
+        //define a color scale using the min and max expression values
+        var colorScale = d3.scale.linear()
+          .domain([results['min'], 0, results['max']])
+          .range(['blue', 'white', 'red']);
+
+        //generate the heatmap
+        var heatmapRow = mySVG.selectAll('.heatmap')
+          .data(results['data'])
+          .enter().append('g');
+
+        var heatmapRects = heatmapRow
+            .selectAll('.rect')
+            .data(function(d) {
+              return d;
+            }).enter().append('svg:rect')
+            .attr('width',w)
+            .attr('height',h)
+            .attr('x', function(d) {
+              return (d[2] * w) + 125;
+            })
+            .attr('y', function(d) {
+              return (d[1] * h) + 50;
+            })
+            .style('fill',function(d) {
+              return colorScale(d[0]);
+            });
+
+        //label columns
+        var columnLabel = mySVG.selectAll('.colLabel')
+          .data(results['cols'])
+          .enter().append('svg:text')
+          .attr('x', function(d,i) {
+            return ((i + 0.5) * w) + 125;
+          })
+          .attr('y', 40)
+          .attr('class','label')
+          .style('text-anchor','middle')
+          .text(function(d) {return d;});
+
+        //label rows
+        var rowLabel = mySVG.selectAll('.rowLabel')
+          .data(results['rows'])
+          .enter().append('svg:text')
+          .attr('x', 65)
+          .attr('y', function(d, i) {
+            return ((i + 0.5) * h) + 52;
+          })
+          .attr('class','label')
+          .style('text-anchor','middle')
+          .text(function(d) {return d;});
+
+        //expression value label
+        var expLab = d3.select('#display')
+          .append('div')
+          .style('height',23)
+          .style('position','absolute')
+          .style('background','FFE53B')
+          .style('opacity',0.8)
+          .style('left',20)
+          .style('display','none');
+
+        //heatmap mouse events
+        heatmapRects
+          .on('mouseover', function(d) {
+            console.log(d);
+            d3.select(this)
+              .attr('stroke-width',1)
+              .attr('stroke','black')
+
+              output = '<b>' + results['data'][d[1]][d[2]][0] + '</b><br>';
+
+              expLab
+                .style('top',((d[1]+1) * h) + 30)
+                .style('left', ((d[2]) * w) + 125)
+                .style('display','block')
+                .html(output);
+          })
+          .on('mouseout', function(d,i) {
+            d3.select(this)
+              .attr('stroke-width',0)
+              .attr('stroke','none')
+
+            expLab
+              .style('display','none')
+          });
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class='container-fluid'>
+    <div class='row'>
+      <div class='col-sm-2'>
+        <h4>
+          Settings
+        </h4>
+        <div class='input-group' style='padding-bottom:5px;width:150px;'>
+          <select class='form-control' id='scope'>
+            <option>Player</option>
+            <option>Team</option>
+          </select>
+        </div>
+        <button class='btn btn-primary' onclick='drawHeatmap()'>Run Analysis</button>
+      </div>
+      <div class='col-sm-6' id='display'/>
+    </div>
+  </div>
+</body>
+{% endblock %}
