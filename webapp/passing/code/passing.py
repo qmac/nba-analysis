@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 import sys
 import random
 
+import json
+import networkx as nx
+from networkx.readwrite import json_graph
+import flask
+
 def strict_append(path, curr):
     path += (curr,)
     if len(path) > 3:
@@ -85,9 +90,19 @@ def simulate_possession(g, df, prev, curr, path):
         return simulate_possession(g, df, curr, succ, path)
 
 def visualize(g):
-    from networkx.drawing.nx_pydot import write_dot
-    nx.draw_graphviz(g)
-    write_dot(g,'../figures/passing_graph.dot')
+    d = json_graph.node_link_data(g) # node-link format to serialize
+    # write json
+    json.dump(d, open('force/force.json','w'))
+    print('Wrote node-link JSON data to force/force.json')
+
+    # Serve the file over http to allow for cross origin requests
+    app = flask.Flask(__name__, static_folder="force")
+
+    @app.route('/<path:path>')
+    def static_proxy(path):
+      return app.send_static_file(path)
+    print('\nGo to http://localhost:8000/force.html to see the example\n')
+    app.run(port=8000)
 
 def main(args):
     df = pd.read_csv('../data/passing_data.csv', index_col=False)
