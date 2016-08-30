@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Force-Directed Layout</title>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js'></script>
     <style>
       circle.node {
         stroke: #fff;
@@ -20,80 +20,111 @@
     </style>
   </head>
   <body>
-    <div id="chart"></div>
-    <script type="text/javascript">
+    <div id='chart'></div>
+    <script type='text/javascript'>
+      // Big thanks to http://www.coppelia.io/2014/07/an-a-to-z-of-extra-features-for-the-d3-force-layout/ for guiding me through visualization improvements
+
       var w = 800,
           h = 500,
           fill = d3.scale.category20();
 
-      var vis = d3.select("#chart")
-        .append("svg:svg")
-          .attr("width", w)
-          .attr("height", h);
+      var vis = d3.select('#chart')
+        .append('svg:svg')
+          .attr('width', w)
+          .attr('height', h);
 
-      d3.json("force.json", function(json) {
-        //console.log(json);
+      d3.json('force.json', function(graph) {
         var force = d3.layout.force()
             .charge(-120)
-            .linkDistance(100)
-            .nodes(json.nodes)
-            .links(json.links)
+            .linkDistance(150)
+            .nodes(graph.nodes)
+            .links(graph.links)
             .size([w, h])
             .start();
 
-        var link = vis.selectAll("line.link")
-            .data(json.links)
-          .enter().append("svg:line")
-            .attr("class", "link")
-            .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-            .attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
+        var link = vis.selectAll('line.link')
+            .data(graph.links)
+          .enter().append('svg:line')
+            .attr('class', 'link')
+            .style('stroke-width', 1)
 
-        var node = vis.selectAll(".node")
-          .data(json.nodes)
-          .enter().append("g")
-          .attr("class", "node")
+        var node = vis.selectAll('.node')
+          .data(graph.nodes)
+          .enter().append('g')
+          .attr('class', 'node')
           .call(force.drag);
 
-        node.append("circle")
-          .attr("r", 5)
-          .style("fill", function (d) { return fill(d.group); })
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; });
+        node.append('circle')
+          .attr('r', 5)
+          .style('fill', function (d) { return fill(d.group); })
+          .attr('cx', function(d) { return d.x; })
+          .attr('cy', function(d) { return d.y; });
 
-        node.append("text")
-          .attr("dx", 10)
-          .attr("dy", ".35em")
+        node.append('text')
+          .attr('dx', 10)
+          .attr('dy', '.35em')
           .text(function(d) { return d.id });
 
-        vis.style("opacity", 1e-6)
+        vis.style('opacity', 1e-6)
           .transition()
             .duration(1000)
-            .style("opacity", 1);
+            .style('opacity', 1);
 
-        force.on("tick", function() {
-          link.attr("x1", function(d) { return d.source.x; })
-              .attr("y1", function(d) { return d.source.y; })
-              .attr("x2", function(d) { return d.target.x; })
-              .attr("y2", function(d) { return d.target.y; });
+        force.on('tick', function() {
+          link.attr('x1', function(d) { return d.source.x; })
+              .attr('y1', function(d) { return d.source.y; })
+              .attr('x2', function(d) { return d.target.x; })
+              .attr('y2', function(d) { return d.target.y; });
 
-          d3.selectAll("circle").attr("cx", function (d) {
+          d3.selectAll('circle').attr('cx', function (d) {
               return d.x;
           })
-              .attr("cy", function (d) {
+              .attr('cy', function (d) {
               return d.y;
           });
 
-          d3.selectAll("text").attr("x", function (d) {
+          d3.selectAll('text').attr('x', function (d) {
               return d.x;
           })
-              .attr("y", function (d) {
+              .attr('y', function (d) {
               return d.y;
           });
-          
         });
+
+        graphLinks = graph.links;
+
+        //adjust threshold
+        function threshold(thresh) {
+          graph.links = graphLinks.filter(function (d) {
+            return d.label >= thresh;
+          });
+          restart();
+        }
+
+        //Restart the visualisation after any node and link changes
+        function restart() {
+          link = link.data(graph.links);
+          link.exit().remove();
+          link.enter().insert("svg:line", ".node").attr("class", "link");
+          node = node.data(graph.nodes);
+          node.exit().remove();
+          node.enter().insert("circle", ".cursor").attr("r", 5).call(force.drag);
+          force.start();
+        }
+
+        d3.select('#chart')
+          .append('input')
+          .attr('type', 'range')
+          .attr('value', 0)
+          .attr('min', 0)
+          .attr('max', 1.0)
+          .attr('step', 0.05)
+          .attr('width', 100)
+          .attr('height', 20)
+          .on('change', function() {
+            var value = eval(d3.select(this).property('value'));
+            threshold(value);
+          });
       });
     </script>
   </body>
