@@ -121,7 +121,7 @@
         function restart() {
           link = link.data(graph.links);
           link.exit().remove();
-          link.enter().insert("svg:line", ".node").attr("class", "link");
+          link.enter().insert("svg:line", ".node").attr("class", "link").style("marker-end",  "url(#suit)");
           node = node.data(graph.nodes);
           node.exit().remove();
           node.enter().insert("circle", ".cursor").attr("r", 5).call(force.drag);
