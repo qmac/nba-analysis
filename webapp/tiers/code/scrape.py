@@ -38,4 +38,4 @@ if __name__ == '__main__':
         print 'Usage: python scrape.py'
         exit(-1)
     
-    scrape_advanced(['2014-15', '2015-16'])
+    scrape_advanced(['2014-15', '2015-16', '2016-17'])
