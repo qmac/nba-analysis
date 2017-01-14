@@ -1,26 +1,10 @@
-import requests
-import csv
-import os
 import sys
 import pandas as pd
 
 from webapp import db_engine
+from nba_analysis.scraping import scrape
 
-def scrape(url):
-    try:
-        response_json = requests.get(url, headers={'user-agent': 'Mozilla/5.0', 'referer': 'http://stats.nba.com/scores/'}).json()
-        headers = response_json["resultSets"][0]["headers"]
-        data = response_json["resultSets"][0]["rowSet"]
-        return headers, data
-    except:
-        print "error"
-
-    return
-
-def scrape_playtypes():
-    play_types = ['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
-                'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound']
-
+def scrape_playtypes(play_types):
     # Scrape the data into a pandas data frame
     df = pd.DataFrame(columns=play_types)
     player_to_team = {}
@@ -53,4 +37,5 @@ if __name__ == '__main__':
         print 'Usage: python scrape.py'
         exit(-1)
     
-    scrape_playtypes()
+    scrape_playtypes(['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
+                'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound'])
