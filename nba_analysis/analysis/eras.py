@@ -7,7 +7,6 @@ df['game_result'] = (df['game_result'] == 'W').astype(int)
 df['total_ppg'] = df['pts'] + df['opp_pts']
 
 # Figure 1
-
 home_court_adv = df.loc[(df['game_location']=='H')].groupby('year_id')['game_result'].mean()
 print "Plotting home_court_adv"
 home_court_adv.plot()

@@ -13,8 +13,6 @@ Summary
 
 **tiers**: clustering NBA players into tiers using the k-means clustering algorithm on advanced statistics
 
-**tracking**: visualization of ball tracking data scraped from stats.nba.com
-
 
 Sources
 -------------------
