@@ -1,3 +1,4 @@
+from sklearn import metrics
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
@@ -30,7 +31,7 @@ def predictions_to_json(predictions):
     seasons = [{'className': row[1]['season'], 'axes':[{'axis': axis, 'value': row[1][axis]} for axis in axes]} for row in predictions.iterrows()]
     return seasons
 
-def pos_classify(player_name, algorithm):
+def classify_player_position(player_name, algorithm):
     # Load data from CSV
     df = pd.DataFrame.from_csv('webapp/positions/data/career_data.csv')
 
@@ -57,4 +58,42 @@ def pos_classify(player_name, algorithm):
     prediction_df = pd.DataFrame(prediction_probabilities, columns=['C', 'C-F', 'F', 'F-C', 'F-G', 'G', 'G-F'])
     prediction_df['season'] = np.array(player['season_id'])
     return predictions_to_json(prediction_df)
+
+def compare_classifiers():
+    df = pd.DataFrame.from_csv('./../data/career_data.csv')
+    df = df[(df['gp'] > 58)]
+    df = df.dropna(subset=feature_columns+[class_column])
+
+    classifiers = [GaussianNB(), SVC(), KNeighborsClassifier(), DecisionTreeClassifier()]
+    training_range = np.arange(0.50, 0.90, 0.02)
+    results = dict((clf, dict((tr, 0) for tr in training_range)) for clf in classifiers)
+    n_trials = 30
+
+    for i in training_range:
+        for j in range(n_trials):
+            df['is_training'] = np.random.uniform(0, 1, len(df)) <= i
+            training_set = df[df['is_training']==True]
+            testing_set = df[df['is_training']==False]
+
+            trainingFeatures = training_set[feature_columns]
+            trainingTargets = training_set[class_column]
+
+            testingFeatures = testing_set[feature_columns]
+            testingTargets = testing_set[class_column]
+
+            for classifier in classifiers:
+                print "------------------------------------------"
+                print classifier
+
+                classifier.fit(trainingFeatures, trainingTargets)
+                results[classifier][i] += classifier.score(testingFeatures, testingTargets)
+
+                predictions = classifier.predict(testingFeatures)
+                print metrics.classification_report(testingTargets, predictions)
+
+    for classifier in classifiers:
+        plt.plot(training_range, [(results[classifier][d]/float(n_trials)) for d in training_range], label=type(classifier))
+        
+    plt.legend(loc=9, bbox_to_anchor=(0.5, -0.03), ncol=2)
+    plt.show()
 
