@@ -7,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 FEATURE_COLUMNS = ['fgm', 
                 'fga', 
@@ -69,7 +70,14 @@ def compare_classifiers():
     classifiers = [GaussianNB(), SVC(), KNeighborsClassifier(), DecisionTreeClassifier()]
 
     for clf in classifiers:
-        score = cross_val_score(clf, data, targets, cv=10)
+        scores = cross_val_score(clf, data, targets, cv=10)
         print '------------------------------------------'
-        print '%s got a 10-fold cross-validation score of %f' % (clf, score)
+        print '%s got a 10-fold cross-validation score of %f' % (clf, scores.mean())
+
+if __name__ == '__main__':
+    if len(sys.argv) != 1:
+        print 'Usage: python positions.py'
+        exit(-1)
+    
+    compare_classifiers()
 
