@@ -1,15 +1,10 @@
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.metrics import silhouette_score
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-
 import json
 import math
-
-from webapp import db_engine
 
 SIZE = 2000 # Size of tier bubbles
 FEATURE_COLUMNS = [
@@ -23,30 +18,9 @@ TIER_NAMES = [
             'Role Players', 'Bench Warmers', 'Scrubs'
             ]
 
-# Elbow Method for determining k
-def plot_inertias(cluster_data):
-    inertias = []
-    for k in range(2, 100):
-        clstr = KMeans(n_clusters=k, random_state=42)
-        clstr.fit(cluster_data)
-        inertias.append(clstr.inertia_)
-
-    plt.figure(0)
-    plt.plot(inertias)
-    plt.savefig('./../figures/inertias.png')
-
-# Silhouette Method for determining k 
-def plot_silhouettes(cluster_data):
-    silhouettes = []
-    for k in range(2, 100):
-        clstr = KMeans(n_clusters=k, random_state=42)
-        cluster_labels = clstr.fit_predict(cluster_data)
-        silhouette = silhouette_score(cluster_data, cluster_labels)
-        silhouettes.append(silhouette)
-
-    plt.figure(1)
-    plt.plot(silhouettes)
-    plt.savefig('./../figures/silhouettes.png')
+def clean(df):
+    df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
+    return df
 
 # Converts clusters into dictionary compatible for visualization
 def clusters_to_json(player_clusters):
@@ -59,15 +33,10 @@ def clusters_to_json(player_clusters):
     return players_dict
 
 # Performs clustering
-def cluster(year, algorithm):
-    # Load data from db
-    df = pd.read_sql('advanced_stats', db_engine)
-
-    # Filter by year
+def cluster(df, year, algorithm='KMeans'):
+    # Clean and filter data
+    df = clean(df)
     df = df[(df['YEAR'] == year)]
-
-    # Remove outliers
-    df = df[(df['GP'] >= (0.7 * df['GP'].max()))]
 
     # Set up fitting data
     names = df['PLAYER_NAME']
@@ -91,11 +60,7 @@ if __name__ == '__main__':
         print 'Usage: python tiers.py year algorithm'
         exit(-1)
     
-    original = pd.DataFrame.from_csv('./../data/career_data.csv')
+    original = pd.DataFrame.from_csv('./../data/advanced_stats.csv')
     df = clean(original)
-    data = df[FEATURE_COLUMNS]
-    targets = df[CLASS_COLUMN]
-    alg, score = compare_classifiers(data, targets)
-    print 'Using %s which got an accuracy of %f' % (alg, score)
-    print classify_player_position(original, sys.argv[1], algorithm=alg)
+    print cluster(original, sys.argv[1], algorithm=sys.argv[2])
 
