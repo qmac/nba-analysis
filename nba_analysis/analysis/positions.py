@@ -1,4 +1,4 @@
-from sklearn.model_selection import cross_val_score
+from nba_analysis.analysis import compare_classifiers
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
@@ -27,28 +27,24 @@ FEATURE_COLUMNS = ['fgm',
 
 CLASS_COLUMN = 'position'
 
+def clean(df):
+    df = df[(df['gp'] > 58)]
+    df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
+    return df
+
 def predictions_to_json(predictions):
     axes = ['G', 'G-F', 'F-G', 'F-C', 'C-F', 'C', 'F']
     seasons = [{'className': row[1]['season'], 'axes':[{'axis': axis, 'value': row[1][axis]} for axis in axes]} for row in predictions.iterrows()]
     return seasons
 
-def classify_player_position(player_name, algorithm):
-    # Load data from CSV
-    df = pd.DataFrame.from_csv('webapp/positions/data/career_data.csv')
-
-    # Remove outliers and empty entries
-    df = df[(df['gp'] > 58)]
-    df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
-
-    # Set up training data
+def classify_player_position(df, player_name, algorithm='SVC'):
+    df = clean(df)
     training = df.drop(player_name)
 
-    # Initialize the classifier
+    # Train the classifier
     clf = eval(algorithm)()
     if algorithm == 'SVC':
         clf.probability = True
-
-    # Perform classifier training
     clf.fit(training[FEATURE_COLUMNS], training[CLASS_COLUMN])
 
     # Run the classifier
@@ -60,24 +56,16 @@ def classify_player_position(player_name, algorithm):
     prediction_df['season'] = np.array(player['season_id'])
     return predictions_to_json(prediction_df)
 
-def compare_classifiers():
-    df = pd.DataFrame.from_csv('./../data/career_data.csv')
-    df = df[(df['gp'] > 58)]
-    df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
-    data = df[FEATURE_COLUMNS]
-    targets = df[CLASS_COLUMN]
-
-    classifiers = [GaussianNB(), SVC(), KNeighborsClassifier(), DecisionTreeClassifier()]
-
-    for clf in classifiers:
-        scores = cross_val_score(clf, data, targets, cv=10)
-        print '------------------------------------------'
-        print '%s got a 10-fold cross-validation score of %f' % (clf, scores.mean())
-
 if __name__ == '__main__':
-    if len(sys.argv) != 1:
-        print 'Usage: python positions.py'
+    if len(sys.argv) != 2:
+        print 'Usage: python positions.py player_name'
         exit(-1)
     
-    compare_classifiers()
+    original = pd.DataFrame.from_csv('./../data/career_data.csv')
+    df = clean(original)
+    data = df[FEATURE_COLUMNS]
+    targets = df[CLASS_COLUMN]
+    alg, score = compare_classifiers(data, targets)
+    print 'Using %s which got an accuracy of %f' % (alg, score)
+    print classify_player_position(original, sys.argv[1], algorithm=alg)
 

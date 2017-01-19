@@ -15,7 +15,6 @@ SIZE = 2000 # Size of tier bubbles
 FEATURE_COLUMNS = [
                     'PIE', 
                     'TS_PCT', 
-                    #'NET_RATING', 
                     'USG_PCT'
                     ]
 TIER_NAMES = [

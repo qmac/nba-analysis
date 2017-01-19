@@ -1,4 +1,4 @@
-from sklearn.model_selection import cross_val_score
+from nba_analysis.analysis import compare_classifiers
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
@@ -9,8 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-FEATURE_COLUMNS = ['location', 
-                'period', 
+FEATURE_COLUMNS = ['period', 
                 'shot_dist', 
                 'dribbles', 
                 'touch_time', 
@@ -20,51 +19,40 @@ FEATURE_COLUMNS = ['location',
 
 CLASS_COLUMN = 'fgm'
 
-def classify_player_shots(player_name, algorithm):
-    # TODO: change structure to be classify on random shots
-    df = pd.DataFrame.from_csv('./../data/shot_data.csv')
-    df = df[(df['player_name'] == player_name)]
+def clean(df):
     df = df.dropna(subset=FEATURE_COLUMNS)
     df['location'] = (df['location'] == 'H').astype(int)
+    return df
 
-    classifier = eval(algorithm)()
-    training_proportion = 0.75
+def classify_player_shots(df, player_name, algorithm='SVC', num_shots=100):
+    df = clean(df)
+    testing_set = df.sample(n=num_shots)
+    training_set = df[(df['player_name'] == player_name)]
 
-    df['is_training'] = np.random.uniform(0, 1, len(df)) <= training_proportion
+    features = training_set[FEATURE_COLUMNS]
+    targets = np.array(training_set[CLASS_COLUMN]).astype(bool)
 
-    training_set = df[df['is_training']==True]
-    testing_set = df[df['is_training']==False]
-
-    trainingFeatures = training_set[FEATURE_COLUMNS]
-    trainingTargets = np.array(training_set[CLASS_COLUMN]).astype(bool)
-
-    classifier.fit(trainingFeatures, trainingTargets)
+    clf = eval(algorithm)()
+    if algorithm == 'SVC':
+        clf.probability = True
+    clf.fit(features, targets)
 
     prediction_set = testing_set.copy()
-    prediction_set[CLASS_COLUMN] = classifier.predict(testing_set[FEATURE_COLUMNS])
+    prediction_set[CLASS_COLUMN] = clf.predict(testing_set[FEATURE_COLUMNS])
 
     return prediction_set
 
-def compare_classifiers(player_name):
-    df = pd.DataFrame.from_csv('./../data/shot_data.csv')
-    df = df[(df['player_name'] == player_name)]
-    df = df.dropna(subset=FEATURE_COLUMNS)
-    df['location'] = (df['location'] == 'H').astype(int)
-
-    data = df[FEATURE_COLUMNS]
-    targets = df[CLASS_COLUMN]
-
-    classifiers = [GaussianNB(), SVC(), KNeighborsClassifier(), DecisionTreeClassifier()]
-
-    for clf in classifiers:
-        scores = cross_val_score(clf, data, targets, cv=10)
-        print '------------------------------------------'
-        print '%s got a 10-fold cross-validation score of %f' % (clf, scores.mean())
-
 if __name__ == '__main__':
-    if len(sys.argv) != 1:
-        print 'Usage: python shots.py'
+    if len(sys.argv) != 2:
+        print 'Usage: python shots.py player_name'
         exit(-1)
     
-    compare_classifiers('Curry, Stephen')
+    original = pd.DataFrame.from_csv('./../data/shot_data.csv')
+    df = clean(original)
+    df = df[(df['player_name'] == sys.argv[1])]
+    data = df[FEATURE_COLUMNS]
+    targets = df[CLASS_COLUMN]
+    alg, score = compare_classifiers(data, targets)
+    print 'Using %s which got an accuracy of %f' % (alg, score)
+    print classify_player_shots(original, sys.argv[1], algorithm=alg)
 
