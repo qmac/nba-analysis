@@ -85,3 +85,17 @@ def cluster(year, algorithm):
     df['tier'] = clstr.labels_
     df['name'] = names
     return clusters_to_json(df)
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print 'Usage: python tiers.py year algorithm'
+        exit(-1)
+    
+    original = pd.DataFrame.from_csv('./../data/career_data.csv')
+    df = clean(original)
+    data = df[FEATURE_COLUMNS]
+    targets = df[CLASS_COLUMN]
+    alg, score = compare_classifiers(data, targets)
+    print 'Using %s which got an accuracy of %f' % (alg, score)
+    print classify_player_position(original, sys.argv[1], algorithm=alg)
+

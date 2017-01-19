@@ -42,8 +42,6 @@ def cluster(scope):
         df = df.drop('Player', 1).groupby('Team', as_index=False).mean()
     elif scope == 'Player':
         df = df.drop('Team', 1)
-    else:
-        raise Exception('This is never supposed to happen')
 
     # Normalize the data
     df[FEATURES] = (df[FEATURES] - df[FEATURES].mean()) / (df[FEATURES].max() - df[FEATURES].min())
@@ -58,3 +56,16 @@ def cluster(scope):
 
     # Convert results to JSON for frontend
     return clusters_to_json(df, scope)
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print 'Usage: python styles.py scope'
+        exit(-1)
+    
+    original = pd.DataFrame.from_csv('./../data/career_data.csv')
+    df = clean(original)
+    data = df[FEATURE_COLUMNS]
+    targets = df[CLASS_COLUMN]
+    alg, score = compare_classifiers(data, targets)
+    print 'Using %s which got an accuracy of %f' % (alg, score)
+    print classify_player_position(original, sys.argv[1], algorithm=alg)
