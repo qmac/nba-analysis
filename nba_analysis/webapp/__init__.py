@@ -8,13 +8,23 @@ import os
 
 app = Flask(__name__)
 Bootstrap(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-db = SQLAlchemy(app)
-db_engine = db.get_engine(app)
+if 'DATABASE_URL' in os.environ:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+    db = SQLAlchemy(app)
+    db_engine = db.get_engine(app)
 
-from .positions.code.classification import pos_classify
-from .tiers.code.cluster import cluster as tier_cluster
-from .styles.code.cluster import cluster as style_cluster
+from nba_analysis.analysis.positions import classify_player_position
+from nba_analysis.analysis.tiers import cluster as tier_cluster
+from nba_analysis.analysis.styles import cluster as style_cluster
+from nba_analysis import config
+
+def get_data_source(table_name):
+    if config.data_source == 'sql':
+        return pd.read_sql(table_name, db_engine)
+    elif config.data_source == 'local':
+        return pd.DataFrame.from_csv('nba_analysis/data/%s.csv' % table_name)
+    else:
+        raise Exception('Invalid data source configuration')
 
 @app.route('/')
 def index():
@@ -34,7 +44,7 @@ def styles():
 
 @app.route('/_get_all_names')
 def get_all_names():
-    df = pd.DataFrame.from_csv('webapp/positions/data/career_data.csv')
+    df = get_data_source('career_data')
     names_json = [{'name':name} for name in df.index.unique()]
     return json.dumps(names_json)
 
@@ -43,7 +53,8 @@ def get_positions():
     player = request.args.get('player')
     algorithm = request.args.get('algorithm')
 
-    results = pos_classify(player, algorithm)
+    df = get_data_source('career_data')
+    results = classify_player_position(df, player, algorithm=algorithm)
     return json.dumps(results)
 
 @app.route('/_get_tiers')
@@ -51,12 +62,14 @@ def get_tiers():
     year = request.args.get('year')
     algorithm = request.args.get('algorithm')
 
-    results = tier_cluster(year, algorithm)
+    df = get_data_source('advanced_stats')
+    results = tier_cluster(df, year, algorithm=algorithm)
     return json.dumps(results)
 
 @app.route('/_get_styles')
 def get_styles():
     scope = request.args.get('scope')
 
+    df = get_data_source('playtype_data')
     results = style_cluster(scope)
     return json.dumps(results)
