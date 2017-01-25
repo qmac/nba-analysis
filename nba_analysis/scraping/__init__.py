@@ -1,7 +1,8 @@
 import requests
-import csv
-import os
 import pandas as pd
+
+from nba_analysis import config
+from nba_analysis.webapp import db_engine
 
 def scrape(url):
     try:
@@ -14,10 +15,17 @@ def scrape(url):
 
     return
 
-def write_to_csv(data, headers, path):
-	df = pd.DataFrame(data=data, columns=headers)
-    df.to_csv(path)
+def scrape_players(indices, current_season_only=True):
+    players_url = "http://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=%s&IsOnlyCurrentSeason=%d" % (config.current_year, current_season_only)
+    players = scrape(players_url)[1]
+    players = [[player[i] for i in indices] for player in players]
+    return players
 
-def write_to_sql(data, headers, engine):
-	df = pd.DataFrame(data=data, columns=headers)
-	df.to_sql(engine)
+def write_to_data_source(data, headers, table_name):
+    df = pd.DataFrame(data=data, columns=headers)
+    if config.data_source == 'sql' and db_engine is not None:
+        return df.to_sql(table_name, db_engine, if_exists='replace')
+    elif config.data_source == 'local':
+        return df.to_csv('nba_analysis/data/%s.csv' % table_name)
+    else:
+        raise Exception('Invalid data source configuration')

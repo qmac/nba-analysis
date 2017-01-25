@@ -5,7 +5,6 @@ from webapp import db_engine
 from nba_analysis.scraping import scrape
 
 def scrape_playtypes(play_types):
-    # Scrape the data into a pandas data frame
     df = pd.DataFrame(columns=play_types)
     player_to_team = {}
     for play_type in play_types:
@@ -34,7 +33,7 @@ def scrape_playtypes(play_types):
 
 if __name__ == '__main__':
     if len(sys.argv) != 1:
-        print 'Usage: python scrape.py'
+        print 'Usage: python platype_data.py'
         exit(-1)
     
     scrape_playtypes(['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 

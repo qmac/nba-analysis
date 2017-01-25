@@ -1,11 +1,10 @@
 import sys
 import pandas as pd
 
-from webapp import db_engine
-from nba_analysis.scraping import scrape
+from nba_analysis.scraping import scrape, write_to_data_source
 
 def scrape_advanced(years):
-    dfs = []
+    all_data = []
     for year in years:
         stats_url = 'http://stats.nba.com/stats/leaguedashplayerstats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&'\
         'DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&'\
@@ -18,16 +17,15 @@ def scrape_advanced(years):
         for row in data:
             row.append(year)
 
-        df = pd.DataFrame(data=data, columns=headers)
-        dfs.append(df)
+        all_data.extend(data)
 
-    table = pd.concat(dfs)
-    table.to_sql('advanced_stats', db_engine, if_exists='replace')
+    return all_data, headers
 
 if __name__ == '__main__':
     if len(sys.argv) != 1:
-        print 'Usage: python scrape.py'
+        print 'Usage: python advanced_stats.py'
         exit(-1)
     
-    scrape_advanced(['2014-15', '2015-16', '2016-17'])
+    data, headers = scrape_advanced(['2014-15', '2015-16', '2016-17'])
+    write_to_data_source(data, headers, 'advanced_stats')
     print 'Finished updating advanced stats in db'

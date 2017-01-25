@@ -1,26 +1,30 @@
-from nba_analysis.scraping import scrape, write_to_csv
+import sys
 
-# Get player information
-players_url = "http://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=2016-17&IsOnlyCurrentSeason=0"
-players = scrape(players_url)[1]
+from nba_analysis.scraping import scrape, scrape_players, write_to_data_source
 
-data = []
-for player in players:
-    player_id, name = player[0], player[1]
-    print player_id, name
+def scrape_career(players):
+    data = []
+    for player in players:
+        player_id, name = player[0], player[1]
+        print player_id, name
 
-    player_url = "http://stats.nba.com/stats/commonplayerinfo?LeagueID=00&PlayerID=%s" % (player_id)
-    player_info = scrape(player_url)[1]
-    position = player_info[0][14]
+        player_url = "http://stats.nba.com/stats/commonplayerinfo?LeagueID=00&PlayerID=%s" % (player_id)
+        player_info = scrape(player_url)[1]
+        position = player_info[0][14]
 
-    shots_url = "http://stats.nba.com/stats/playercareerstats?LeagueID=00&PerMode=PerGame&PlayerID=%s" % (player_id)
-    headers, season_data = scrape(shots_url)
-    headers = ['name', 'position'] + headers
-    season_data = [[name, position] + season_stats for season_stats in season_data]
-    data.append(season_data)
+        career_url = "http://stats.nba.com/stats/playercareerstats?LeagueID=00&PerMode=PerGame&PlayerID=%s" % (player_id)
+        headers, season_data = scrape(career_url)
+        headers = ['name', 'position'] + headers
+        season_data = [[name, position] + season_stats for season_stats in season_data]
+        data.extend(season_data)
 
+    return data, headers
 
-if not os.path.exists('positions/data/'):
-    os.makedirs('positions/data/')
-
-write_to_csv(headers, data, 'positions/data/career_data.csv'')
+if __name__ == '__main__':
+    if len(sys.argv) != 1:
+        print 'Usage: python career_stats.py'
+        exit(-1)
+    
+    players = scrape_players([0, 1], current_season_only=True)
+    data, headers = scrape_career(players)
+    write_to_data_source(data, headers, 'career_data')

@@ -12,6 +12,8 @@ if 'DATABASE_URL' in os.environ:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
     db = SQLAlchemy(app)
     db_engine = db.get_engine(app)
+else:
+    db_engine = None
 
 from nba_analysis.analysis.positions import classify_player_position
 from nba_analysis.analysis.tiers import cluster as tier_cluster

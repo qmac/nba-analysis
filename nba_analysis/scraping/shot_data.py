@@ -1,29 +1,26 @@
-from nba_analysis.scraping import scrape, write_to_csv
+import sys
 
-# Get player information
-players_url = "http://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=2016-17&IsOnlyCurrentSeason=1"
-players_data = scrape(players_url)[1]
+from nba_analysis.scraping import scrape, scrape_players, write_to_data_source
 
-data
-for player_record in players_data:
-    player_id = player_record[0]
-    name = player_record[1]
-    team = player_record[9]
+def scrape_shots(players):
+    data = []
+    for player in players:
+        shots_url = "http://stats.nba.com/stats/playerdashptshotlog?DateFrom=&DateTo=\
+        &GameSegment=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&Period=0\
+        &PlayerID=%s&Season=2016-17&SeasonSegment=&SeasonType=Regular+Season&TeamID=0&VsConference=&VsDivision=" % (player[0])
+        
+        headers, shots_data = scrape(shots_url)
+        headers = headers + ['name', 'team']
+        shots_data = [shot + [player[1], player[2]] for shot in shots_data]
+        data.extend(shots_data)
 
-    shots_url = "http://stats.nba.com/stats/playerdashptshotlog?DateFrom=&DateTo=\
-    &GameSegment=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&Period=0\
-    &PlayerID=%s&Season=2016-17&SeasonSegment=&SeasonType=Regular+Season&TeamID=0&VsConference=&VsDivision=" % (player_id)
+    return data, headers
+
+if __name__ == '__main__':
+    if len(sys.argv) != 1:
+        print 'Usage: python shot_data.py'
+        exit(-1)
     
-    headers, shots_data = scrape(shots_url)
-    headers = headers + ['name', 'team']
-    shots_data = [shot + [name, team] for shot in shots_data]
-    data.extend(shots_data)
-
-
-# Delete file if already exists
-try:
-    os.remove('./../data/shot_data.csv')
-except OSError:
-    pass
-
-write_to_csv(headers, data, './../data/shot_data.csv')
+    players = scrape_players([0, 1, 9])
+    data, headers = scrape_shots(players)
+    write_to_data_source(data, headers, 'shot_data')
