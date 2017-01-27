@@ -18,13 +18,14 @@ def scrape_career(players):
         season_data = [[name, position] + season_stats for season_stats in season_data]
         data.extend(season_data)
 
-    return data, headers
+    return headers, data
 
 if __name__ == '__main__':
     if len(sys.argv) != 1:
         print 'Usage: python career_stats.py'
         exit(-1)
     
-    players = scrape_players([0, 1], current_season_only=True)
-    data, headers = scrape_career(players)
+    players = scrape_players([0, 1], current_season_only=False)
+    headers, data = scrape_career(players)
     write_to_data_source(data, headers, 'career_data')
+    print 'Finished updating career stats in db'

@@ -2,39 +2,34 @@ import sys
 import pandas as pd
 
 from webapp import db_engine
-from nba_analysis.scraping import scrape
+from nba_analysis.scraping import scrape_synergy, write_to_data_source
 
 def scrape_playtypes(play_types):
     df = pd.DataFrame(columns=play_types)
-    player_to_team = {}
+    player_dicts = {}
     for play_type in play_types:
-        url = 'http://stats.nba.com/js/data/playtype/player_%s.js' % (play_type)
-        headers, data = scrape(url)
+        url = 'http://stats-prod.nba.com/wp-json/statscms/v1/synergy/player/?category=%s&limit=500&names=offensive&q=2475619&season=2016&seasonType=Reg' % play_type
+        players = scrape_synergy(url)
+        
+        for player in players:
+            if isinstance(player['PlayerLastName'], (int, long)):
+                continue
+            name = '%s %s' % (player['PlayerFirstName'], player['PlayerLastName'])
+            player_dict = {} if name not in player_dicts else player_dicts[name]
+            player_dict[play_type] = player['Time']
+            player_dict['Team'] = player['TeamNameAbbreviation']
+            player_dicts[name] = player_dict
 
-        player_first_idx = headers.index('PlayerFirstName')
-        player_last_idx = headers.index('PlayerLastName')
-        team_idx = headers.index('TeamNameAbbreviation')
-        time_idx = headers.index('Time')
-
-        dicts = {}
-        for stats in data:
-            full_name = stats[player_first_idx] + " " + stats[player_last_idx]
-            dicts[full_name] = stats[time_idx]
-            player_to_team[full_name] = stats[team_idx]
-        df[play_type] = pd.Series(index=dicts.keys(), data=dicts.values())
-
-    df['Team'] = pd.Series(index=player_to_team.keys(), data=player_to_team.values())
-    df = df.fillna(0)
-
-    # Save data to db
-    df.to_sql('playtype_data', db_engine, if_exists='replace', index_label='Player')
-    print 'Finished updating play type data in db'
-    return
+    headers = ['Player', 'Team'] + play_types
+    data = [[p[0]] + [p[1][h] if h in p[1] else 0 for h in headers[1:]] for p in player_dicts.items()]
+    return headers, data
 
 if __name__ == '__main__':
     if len(sys.argv) != 1:
         print 'Usage: python platype_data.py'
         exit(-1)
     
-    scrape_playtypes(['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
+    headers, data = scrape_playtypes(['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
                 'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound'])
+    write_to_data_source(data, headers, 'playtype_data')
+    print 'Finished updating playtype data in db'

@@ -19,13 +19,13 @@ def scrape_advanced(years):
 
         all_data.extend(data)
 
-    return all_data, headers
+    return headers, all_data
 
 if __name__ == '__main__':
     if len(sys.argv) != 1:
         print 'Usage: python advanced_stats.py'
         exit(-1)
     
-    data, headers = scrape_advanced(['2014-15', '2015-16', '2016-17'])
+    headers, data = scrape_advanced(['2014-15', '2015-16', '2016-17'])
     write_to_data_source(data, headers, 'advanced_stats')
     print 'Finished updating advanced stats in db'

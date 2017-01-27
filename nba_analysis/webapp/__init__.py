@@ -24,7 +24,7 @@ def get_data_source(table_name):
     if config.data_source == 'sql':
         return pd.read_sql(table_name, db_engine)
     elif config.data_source == 'local':
-        return pd.DataFrame.from_csv('nba_analysis/data/%s.csv' % table_name)
+        return pd.DataFrame.from_csv('nba_analysis/data/%s.csv' % table_name, encoding='utf-8')
     else:
         raise Exception('Invalid data source configuration')
 
