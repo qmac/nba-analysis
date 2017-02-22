@@ -3,16 +3,11 @@ NBA Data Analysis
 
 Summary
 -------------------
-**eras**: comparison of various NBA statistics (home court advantage, points per game) across time.
-
 **positions**: classifying NBA players into positions using a KNearestNeighbors classifier on season statistics
-
-**shots**: classifying shot make/miss using a Naive Bayes classifier on shot data from the 2014-2015 NBA season for a given player
 
 **styles**: clustering NBA teams and players based on their play styles determined by the frequencies of play types
 
 **tiers**: clustering NBA players into tiers using the k-means clustering algorithm on advanced statistics
-
 
 Data
 -------------------
@@ -25,8 +20,13 @@ All of the needed libraries can be installed using `pip install -r requirements.
 
 Install the package using `python setup.py install`.
 
+Unless you have the required database URI, change the package `config.py` file to have `data_source = 'local'`.
+
+Prior to running the app, you will likely want to scrape the data, to do this run `python nba_analysis/scraping/*.py`. Do this after changing the package config so that the data is downloaded locally. All the data should be downloaded into the directory `nba_analysis/data/`.
+
 To run the web app, run `python runserver.py` and point your browser to `http://localhost:5000/`.
 
+Alternatively, to run individual analyses, navigate to the `nba_analysis/analysis` directory (must enter subdirectory due to hard-coded data paths) and run `python <analysis_script> <params>`.
 
 Disclaimer
 -------------------

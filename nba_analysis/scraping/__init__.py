@@ -1,3 +1,4 @@
+import os
 import requests
 import pandas as pd
 
@@ -33,6 +34,8 @@ def write_to_data_source(data, headers, table_name):
     if config.data_source == 'sql' and db_engine is not None:
         return df.to_sql(table_name, db_engine, if_exists='replace')
     elif config.data_source == 'local':
+        if not os.path.exists('nba_analysis/data/'):
+            os.makedirs('nba_analysis/data/')
         return df.to_csv('nba_analysis/data/%s.csv' % table_name, encoding='utf-8')
     else:
         raise Exception('Invalid data source configuration')
