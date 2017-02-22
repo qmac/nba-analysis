@@ -20,8 +20,7 @@ def scrape_synergy(url, num_retries=10):
             players = response_json['results']
             return players
         except:
-            continue
-    print 'Encountered exception while scraping'
+            print 'Encountered exception while scraping'
 
 def scrape_players(indices, current_season_only=True):
     players_url = 'http://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=%s&IsOnlyCurrentSeason=%d' % (config.current_year, current_season_only)

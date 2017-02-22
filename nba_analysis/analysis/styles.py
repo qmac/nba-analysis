@@ -1,6 +1,7 @@
 from sklearn.cluster import AffinityPropagation
 import pandas as pd
 import json
+import sys
 
 FEATURES = ['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
             'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound']
@@ -57,5 +58,5 @@ if __name__ == '__main__':
         print 'Usage: python styles.py scope'
         exit(-1)
     
-    df = pd.DataFrame.from_csv('./../data/styles_data.csv')
+    df = pd.DataFrame.from_csv('./../data/playtype_data.csv')
     print cluster(df, sys.argv[1])

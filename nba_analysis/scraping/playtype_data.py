@@ -1,7 +1,6 @@
 import sys
 import pandas as pd
 
-from webapp import db_engine
 from nba_analysis.scraping import scrape_synergy, write_to_data_source
 
 def scrape_playtypes(play_types):

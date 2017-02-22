@@ -96,7 +96,6 @@
         //heatmap mouse events
         heatmapRects
           .on('mouseover', function(d) {
-            console.log(d);
             d3.select(this)
               .attr('stroke-width',1)
               .attr('stroke','black')

@@ -1,8 +1,13 @@
-from flask import Flask, render_template, request
+from nba_analysis.analysis.positions import classify_player_position
+from nba_analysis.analysis.tiers import cluster as tier_cluster
+from nba_analysis.analysis.styles import cluster as style_cluster
+from nba_analysis import config
+
+from flask import Flask, render_template, request, jsonify, json
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 
-import json
+#import json
 import pandas as pd
 import os
 
@@ -14,11 +19,6 @@ if 'DATABASE_URL' in os.environ:
     db_engine = db.get_engine(app)
 else:
     db_engine = None
-
-from nba_analysis.analysis.positions import classify_player_position
-from nba_analysis.analysis.tiers import cluster as tier_cluster
-from nba_analysis.analysis.styles import cluster as style_cluster
-from nba_analysis import config
 
 def get_data_source(table_name):
     if config.data_source == 'sql':
@@ -47,7 +47,7 @@ def styles():
 @app.route('/_get_all_names')
 def get_all_names():
     df = get_data_source('career_data')
-    names_json = [{'name':name} for name in df.index.unique()]
+    names_json = [{'name':name} for name in df['name'].unique()]
     return json.dumps(names_json)
 
 @app.route('/_get_positions')
@@ -73,5 +73,5 @@ def get_styles():
     scope = request.args.get('scope')
 
     df = get_data_source('playtype_data')
-    results = style_cluster(scope)
+    results = style_cluster(df, scope)
     return json.dumps(results)
