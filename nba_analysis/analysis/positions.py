@@ -59,6 +59,7 @@ if __name__ == '__main__':
         exit(-1)
     
     df = pd.DataFrame.from_csv('./../data/career_data.csv')
+    df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
     data = df[FEATURE_COLUMNS]
     targets = df[CLASS_COLUMN]
     alg, score = compare_classifiers(data, targets)

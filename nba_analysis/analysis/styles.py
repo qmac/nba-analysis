@@ -8,9 +8,8 @@ FEATURES = ['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan',
 
 # Converts clusters into dictionary compatible for visualization
 def clusters_to_json(df, scope):
-    vectors_df = df.drop([scope, 'cluster'], 1)
+    vectors_df = df[FEATURES]
     results = {}
-
     results['cols'] = FEATURES
     results['min'] = vectors_df.min().min()
     results['max'] = vectors_df.max().max()
