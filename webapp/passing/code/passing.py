@@ -105,7 +105,7 @@ def visualize(g):
     app.run(port=8000)
 
 def main(args):
-    df = pd.read_csv('../data/passing_data.csv', index_col=False)
+    df = pd.read_csv('../../../nba_analysis/data/passing_data.csv')
     df = df[(df['TEAM_NAME'] == args[1])]
 
     g = construct_graph(df)

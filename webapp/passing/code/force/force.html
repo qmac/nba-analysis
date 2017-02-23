@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Force-Directed Layout</title>
     <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js'></script>
     <style>
       circle.node {
@@ -34,6 +33,11 @@
           .attr('height', h);
 
       d3.json('force.json', function(graph) {
+        var visibleLinks = [];
+        graph.nodes.forEach(function (n) {
+          n.group = 0;
+        });
+
         var force = d3.layout.force()
             .charge(-120)
             .linkDistance(250)
@@ -43,7 +47,7 @@
             .start();
 
         var link = vis.selectAll('line.link')
-            .data(graph.links)
+            .data(visibleLinks)
           .enter().append('svg:line')
             .attr('class', 'link')
             .style('stroke-width', 1)
@@ -56,8 +60,7 @@
           .call(force.drag);
 
         node.append('circle')
-          .attr('r', 5)
-          .style('fill', function (d) { return fill(d.group); })
+          .attr('r', 10)
           .attr('cx', function(d) { return d.x; })
           .attr('cy', function(d) { return d.y; });
 
@@ -92,56 +95,89 @@
               .attr('x2', function(d) { return d.target.x; })
               .attr('y2', function(d) { return d.target.y; });
 
-          d3.selectAll('circle').attr('cx', function (d) {
+          d3.selectAll('circle')
+            .attr('cx', function (d) {
               return d.x;
-          })
-              .attr('cy', function (d) {
+            })
+            .attr('cy', function (d) {
               return d.y;
-          });
+            })
+            .style('fill', function (d) {
+              if (d.group === 0) {
+                return 'rgb(31, 119, 180)';
+              }
+              else {
+                return 'rgb(255, 127, 14)'
+              }
+            });
 
-          d3.selectAll('text').attr('x', function (d) {
+          d3.selectAll('text')
+            .attr('x', function (d) {
               return d.x;
-          })
-              .attr('y', function (d) {
+            })
+            .attr('y', function (d) {
               return d.y;
-          });
+            });
         });
 
-        graphLinks = graph.links;
+        function sleep(ms) {
+          return new Promise(resolve => setTimeout(resolve, ms));
+        }
 
-        //adjust threshold
-        function threshold(thresh) {
-          graph.links = graphLinks.filter(function (d) {
-            return d.label >= thresh;
-          });
+        async function runSimulation() {
+          var source = 0;
+          visibleLinks = [];
+          
+          graph.nodes.forEach(function (n) {
+              if (n.index === source) {
+                n.group = 1;
+              }
+              else {
+                n.group = 0;
+              }
+            });
           restart();
+          
+          while (source != 5) {
+            await sleep(1500);
+            var potentialLinks = graph.links.filter(function (d) {
+              return d.source.index === source;
+            });
+            var linkProbs = potentialLinks.map(function (l) {
+              return l.label;
+            });
+            rnd = Math.random();
+            idx = linkProbs.findIndex( a => (rnd -= a) < 0 );
+            visibleLinks.push(potentialLinks[idx]);
+            source = potentialLinks[idx].target.index;
+            graph.nodes.forEach(function (n) {
+              if (n.index === source) {
+                n.group = 1;
+              }
+            });
+            restart();
+          }
         }
 
         //Restart the visualisation after any node and link changes
         function restart() {
-          link = link.data(graph.links);
+          link = link.data(visibleLinks);
           link.exit().remove();
           link.enter().insert("svg:line", ".node").attr("class", "link").style("marker-end",  "url(#suit)");
           node = node.data(graph.nodes);
           node.exit().remove();
-          node.enter().insert("circle", ".cursor").attr("r", 5).call(force.drag);
+          node.enter().insert("circle", ".cursor")
+            .attr("r", 10)
+            .call(force.drag);
           force.start();
         }
 
         d3.select('#chart')
-          .append('input')
-          .attr('type', 'range')
-          .attr('value', 0)
-          .attr('min', 0)
-          .attr('max', 1.0)
-          .attr('step', 0.05)
-          .attr('width', 100)
-          .attr('height', 20)
-          .on('change', function() {
-            var value = eval(d3.select(this).property('value'));
-            threshold(value);
-          });
+          .append('button')
+          .attr('type', 'button')
+          .text('Simulate Possession')
+          .on('click', runSimulation);
       });
     </script>
   </body>
-</html>
+</ht
