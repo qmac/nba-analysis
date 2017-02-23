@@ -10,10 +10,12 @@
     // Big thanks to http://www.coppelia.io/2014/07/an-a-to-z-of-extra-features-for-the-d3-force-layout/ for guiding me through visualization improvements
 
     var w = 800,
-        h = 500,
-        fill = d3.scale.category20();
+        h = 500;
 
     function drawGraph() {
+      // Remove the previous svg
+      d3.select('svg').remove();
+
       var vis = d3.select('#chart')
         .append('svg:svg')
           .attr('width', w)

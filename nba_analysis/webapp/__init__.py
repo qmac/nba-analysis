@@ -8,7 +8,6 @@ from flask import Flask, render_template, request, jsonify, json
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 
-#import json
 import pandas as pd
 import os
 

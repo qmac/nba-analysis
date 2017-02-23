@@ -5,10 +5,6 @@ import networkx as nx
 import sys
 import random
 
-import json
-import networkx as nx
-from networkx.readwrite import json_graph
-
 def strict_append(path, curr):
     path += (curr,)
     if len(path) > 3:
@@ -32,7 +28,7 @@ def construct_graph(df):
     graph = nx.DiGraph()
     graph.add_nodes_from(df['PLAYER_NAME_LAST_FIRST'].unique())
     passes = df.as_matrix(columns=['PLAYER_NAME_LAST_FIRST', 'PASS_TO', 'FREQUENCY'])
-    graph.add_weighted_edges_from(passes, weight='label') # weight=label needed for viz
+    graph.add_weighted_edges_from(passes, weight='label')
     return graph
 
 def simulate(g, df, possessions):
@@ -90,39 +86,34 @@ def simulate_possession(g, df, prev, curr, path):
 def get_graph(df, team):
     df = df[df['TEAM_NAME'] == team]
     g = construct_graph(df)
-    return json_graph.node_link_data(g)
+    return nx.readwrite.json_graph.node_link_data(g)
+
+def graph_from_json(json):
+    return nx.readwrite.json_graph.node_link_graph(json)
 
 def main(args):
-    df = pd.read_csv('../../../nba_analysis/data/passing_data.csv')
-    df = df[(df['TEAM_NAME'] == args[1])]
-
-    g = construct_graph(df)
     game = simulate(g, df, int(args[2]))
     boxscore = condense_dicts(game[1], game[2])
     print '==============GAME SUMMARY================'
-    print
     print 'FG PCT: %f' % (game[0])
-    print
     print '=========================================='
-    print
     print '===============BOX SCORE=================='
-    print
     print 'Points\t\tAssists\t\tPlayer'
     for key in boxscore:
         print '%d\t\t%d\t\t%s' % (boxscore[key][0], boxscore[key][1], key)
-    print
     print '=========================================='
-    print
     print '============LINEUPS SUMMARY==============='
     for key in game[3]:
         if game[3][key] > 2:
             print key, game[3][key]
-    print
     print '=========================================='
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print 'Usage: python scrape.py TEAM_NAME NUM_POSSESSIONS'
+        print 'Usage: python scrape.py team num_possessions'
         exit(-1)
-    main(sys.argv)
+
+    df = pd.DataFrame.from_csv('./../data/passing_data.csv')
+    g = construct_graph(df)
+    print get_graph(df, sys.argv[1])
     
