@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import networkx as nx
-import matplotlib.pyplot as plt
 
 import sys
 import random
@@ -9,7 +8,6 @@ import random
 import json
 import networkx as nx
 from networkx.readwrite import json_graph
-import flask
 
 def strict_append(path, curr):
     path += (curr,)
@@ -89,20 +87,10 @@ def simulate_possession(g, df, prev, curr, path):
         succ = np.random.choice(neighbors, p=weights)
         return simulate_possession(g, df, curr, succ, path)
 
-def visualize(g):
-    d = json_graph.node_link_data(g) # node-link format to serialize
-    # write json
-    json.dump(d, open('force/force.json','w'))
-    print('Wrote node-link JSON data to force/force.json')
-
-    # Serve the file over http to allow for cross origin requests
-    app = flask.Flask(__name__, static_folder="force")
-
-    @app.route('/<path:path>')
-    def static_proxy(path):
-      return app.send_static_file(path)
-    print('\nGo to http://localhost:8000/force.html to see the example\n')
-    app.run(port=8000)
+def get_graph(df, team):
+    df = df[df['TEAM_NAME'] == team]
+    g = construct_graph(df)
+    return json_graph.node_link_data(g)
 
 def main(args):
     df = pd.read_csv('../../../nba_analysis/data/passing_data.csv')
@@ -131,7 +119,6 @@ def main(args):
             print key, game[3][key]
     print
     print '=========================================='
-    visualize(g)
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

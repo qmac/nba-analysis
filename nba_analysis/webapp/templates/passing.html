@@ -1,38 +1,28 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js'></script>
-    <style>
-      circle.node {
-        stroke: #fff;
-        stroke-width: 1.5px;
-      }
+{% extends 'bootstrap/base.html' %}
+{% block title %}NBA Analysis{% endblock %}
 
-      line.link {
-        stroke: #999;
-        stroke-opacity: .6;
-      }
+{% include 'navbar.html' %}
 
-      .node text {
-        font: 9px helvetica;
-      }
-    </style>
-  </head>
-  <body>
-    <div id='chart'></div>
-    <script type='text/javascript'>
-      // Big thanks to http://www.coppelia.io/2014/07/an-a-to-z-of-extra-features-for-the-d3-force-layout/ for guiding me through visualization improvements
+{% block content %}
+<head>
+  <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js'></script>
+  <script type='text/javascript'>
+    // Big thanks to http://www.coppelia.io/2014/07/an-a-to-z-of-extra-features-for-the-d3-force-layout/ for guiding me through visualization improvements
 
-      var w = 800,
-          h = 500,
-          fill = d3.scale.category20();
+    var w = 800,
+        h = 500,
+        fill = d3.scale.category20();
 
+    function drawGraph() {
       var vis = d3.select('#chart')
         .append('svg:svg')
           .attr('width', w)
           .attr('height', h);
 
-      d3.json('force.json', function(graph) {
+      var team_select = document.getElementById('team');
+      var team = team_select.options[team_select.selectedIndex].text;
+      var url = '/_get_passing?team=' + team;
+      d3.json(url, function(graph) {
         var visibleLinks = [];
         graph.nodes.forEach(function (n) {
           n.group = 0;
@@ -178,6 +168,69 @@
           .text('Simulate Possession')
           .on('click', runSimulation);
       });
-    </script>
-  </body>
-</ht
+    }
+  </script>
+  <style>
+    circle.node {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+
+    line.link {
+      stroke: #999;
+      stroke-opacity: .6;
+    }
+
+    .node text {
+      font: 9px helvetica;
+    }
+  </style>
+</head>
+<body>
+  <div class='container-fluid'>
+    <div class='row'>
+      <div class='col-sm-2'>
+        <h4>
+          Settings
+        </h4>
+        <div class='input-group' style='padding-bottom:5px;width:200px;'>
+          <select class='form-control' id='team'>
+            <option>Atlanta Hawks</option>
+            <option>Boston Celtics</option>
+            <option>Brooklyn Nets</option>
+            <option>Charlotte Hornets</option>
+            <option>Chicago Bulls</option>
+            <option>Cleveland Cavaliers</option>
+            <option>Dallas Mavericks</option>
+            <option>Denver Nuggets</option>
+            <option>Detroit Pistons</option>
+            <option>Golden State Warriors</option>
+            <option>Houston Rockets</option>
+            <option>Indiana Pacers</option>
+            <option>Los Angeles Clippers</option>
+            <option>Los Angeles Lakers</option>
+            <option>Memphis Grizzlies</option>
+            <option>Miami Heat</option>
+            <option>Milwaukee Bucks</option>
+            <option>Minnesota Timberwolves</option>
+            <option>New Orleans Pelicans</option>
+            <option>New York Knicks</option>
+            <option>Oklahoma City Thunder</option>
+            <option>Orlando Magic</option>
+            <option>Philadelphia 76ers</option>
+            <option>Phoenix Suns</option>
+            <option>Portland Trail Blazers</option>
+            <option>Sacramento Kings</option>
+            <option>San Antonio Spurs</option>
+            <option>Toronto Raptors</option>
+            <option>Utah Jazz</option>
+            <option>Washington Wizards</option>
+          </select>
+        </div>
+        <button class='btn btn-primary' onclick='drawGraph()'>Load Analysis</button>
+      </div>
+      <div class='col-sm-6' id='chart'/>
+    </div>
+  </div>
+</body>
+{% endblock %}
