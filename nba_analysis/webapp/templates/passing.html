@@ -21,8 +21,8 @@
           .attr('width', w)
           .attr('height', h);
 
-      var team_select = document.getElementById('team');
-      var team = team_select.options[team_select.selectedIndex].text;
+      var teamSelect = document.getElementById('team');
+      var team = teamSelect.options[teamSelect.selectedIndex].text;
       var url = '/_get_passing?team=' + team;
       d3.json(url, function(graph) {
         var visibleLinks = [];
@@ -45,18 +45,18 @@
             .style('stroke-width', 1)
             .style("marker-end",  "url(#suit)");
 
-        var node = vis.selectAll('.node')
+        var nodes = vis.selectAll('.node')
           .data(graph.nodes)
           .enter().append('g')
           .attr('class', 'node')
           .call(force.drag);
 
-        node.append('circle')
+        nodes.append('circle')
           .attr('r', 10)
           .attr('cx', function(d) { return d.x; })
           .attr('cy', function(d) { return d.y; });
 
-        node.append('text')
+        nodes.append('text')
           .attr('dx', 10)
           .attr('dy', '.35em')
           .text(function(d) { return d.id });
@@ -112,26 +112,24 @@
             });
         });
 
-        function sleep(ms) {
-          return new Promise(resolve => setTimeout(resolve, ms));
+        //Restart the visualisation after any node and link changes
+        function restart() {
+          link = link.data(visibleLinks);
+          link.exit().remove();
+          link.enter().insert("svg:line", ".node").attr("class", "link").style("marker-end",  "url(#suit)");
+          nodes = nodes.data(graph.nodes);
+          nodes.exit().remove();
+          nodes.enter().insert("circle", ".cursor")
+            .attr("r", 10)
+            .call(force.drag);
+          force.start();
         }
 
-        async function runSimulation() {
-          var source = 0;
-          visibleLinks = [];
-          
-          graph.nodes.forEach(function (n) {
-              if (n.index === source) {
-                n.group = 1;
-              }
-              else {
-                n.group = 0;
-              }
-            });
-          restart();
-          
+        function findPath() {
+          var path = [];
+          var source = Math.floor(Math.random() * graph.nodes.length);
+          path.push(source);
           while (source != 5) {
-            await sleep(1500);
             var potentialLinks = graph.links.filter(function (d) {
               return d.source.index === source;
             });
@@ -140,34 +138,73 @@
             });
             rnd = Math.random();
             idx = linkProbs.findIndex( a => (rnd -= a) < 0 );
-            visibleLinks.push(potentialLinks[idx]);
             source = potentialLinks[idx].target.index;
-            graph.nodes.forEach(function (n) {
-              if (n.index === source) {
-                n.group = 1;
+            path.push(source);
+          }
+          return path;
+        }
+
+        function runPossession(path) {
+          visibleLinks = [];
+          var i = 0;
+
+          graph.nodes.forEach(function (n) {
+            if (n.index === path[0]) {
+              n.group = 1;
+            }
+            else {
+              n.group = 0;
+            }
+          });
+          restart();
+
+          function loop() {
+            setTimeout(function () {
+              graph.links.forEach(function (l) {
+                if (l.source.index === path[i] && l.target.index === path[i+1]) {
+                  visibleLinks.push(l);
+                }
+              });
+              graph.nodes.forEach(function (n) {
+                if (n.index === path[i+1]) {
+                  n.group = 1;
+                }
+              });
+              restart();
+              i++;
+              if (i < path.length - 1) {
+                loop();
               }
-            });
-            restart();
+            }, 1500);
+          }
+          loop();
+        }
+
+        function runSimulation() {
+          var possessionsInput = document.getElementById('numPossesions');
+          var numPossesions = parseInt(possessionsInput.value);
+
+          for (count = 0; count < numPossesions; count++) {
+            var path = findPath();
+            if (count === 0) {
+              runPossession(path);
+            }
+            console.log(path);
           }
         }
 
-        //Restart the visualisation after any node and link changes
-        function restart() {
-          link = link.data(visibleLinks);
-          link.exit().remove();
-          link.enter().insert("svg:line", ".node").attr("class", "link").style("marker-end",  "url(#suit)");
-          node = node.data(graph.nodes);
-          node.exit().remove();
-          node.enter().insert("circle", ".cursor")
-            .attr("r", 10)
-            .call(force.drag);
-          force.start();
-        }
+        d3.select('#chart')
+          .append('input')
+          .attr('type', 'number')
+          .attr('id', 'numPossesions')
+          .attr('min', '1')
+          .attr('max', '200')
+          .attr('value', '1');
 
         d3.select('#chart')
           .append('button')
           .attr('type', 'button')
-          .text('Simulate Possession')
+          .text('Simulate')
           .on('click', runSimulation);
       });
     }
