@@ -15,6 +15,12 @@
     function drawGraph() {
       // Remove the previous svg
       d3.select('svg').remove();
+      d3.select('#numPossesions').remove();
+      d3.select('#simulateButton').remove();
+      var possessionsLog = document.getElementById('log');
+      while (possessionsLog.rows.length > 1) {
+        possessionsLog.deleteRow(1);
+      }
 
       var vis = d3.select('#chart')
         .append('svg:svg')
@@ -175,7 +181,7 @@
               if (i < path.length - 1) {
                 loop();
               }
-            }, 1500);
+            }, 1000);
           }
           loop();
         }
@@ -184,16 +190,28 @@
           var possessionsInput = document.getElementById('numPossesions');
           var numPossesions = parseInt(possessionsInput.value);
 
+          document.getElementById('simulateButton').disabled = true;
+
           for (count = 0; count < numPossesions; count++) {
             var path = findPath();
             if (count === 0) {
               runPossession(path);
             }
-            console.log(path);
+            var possessionsLog = document.getElementById('log');
+            var row = possessionsLog.insertRow(1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+
+            // Add some text to the new cells:
+            cell1.innerHTML = path;
+            cell2.innerHTML = 0;
           }
+          setTimeout(function () {
+            document.getElementById('simulateButton').disabled = false;
+          }, 5000);
         }
 
-        d3.select('#chart')
+        d3.select('#chartDetail')
           .append('input')
           .attr('type', 'number')
           .attr('id', 'numPossesions')
@@ -201,9 +219,10 @@
           .attr('max', '200')
           .attr('value', '1');
 
-        d3.select('#chart')
+        d3.select('#chartDetail')
           .append('button')
           .attr('type', 'button')
+          .attr('id', 'simulateButton')
           .text('Simulate')
           .on('click', runSimulation);
       });
@@ -230,8 +249,8 @@
     <div class='row'>
       <div class='col-sm-2'>
         <h4>
-          Settings
-        </h4>
+            Settings
+          </h4>
         <div class='input-group' style='padding-bottom:5px;width:200px;'>
           <select class='form-control' id='team'>
             <option>Atlanta Hawks</option>
@@ -268,7 +287,26 @@
         </div>
         <button class='btn btn-primary' onclick='drawGraph()'>Load Analysis</button>
       </div>
-      <div class='col-sm-6' id='chart'/>
+    </div>
+    <div class='row'>
+    <div class='col-sm-6' id='chart' style='height:500px;width:800px'>
+    </div>
+    <div class='col-sm-3' id='chartDetail'>
+    </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-8'>
+        <div class='container' style='height:300px;overflow:auto;''>
+          <table class='table' id='log'>
+            <thead>
+              <tr>
+                <th>Passing Path</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </body>
