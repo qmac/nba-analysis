@@ -197,13 +197,17 @@
             if (count === 0) {
               runPossession(path);
             }
+            var stringPath = path.map(function (n) {
+              return graph.nodes[n].id;
+            }).join('-->');
+
             var possessionsLog = document.getElementById('log');
             var row = possessionsLog.insertRow(1);
             var cell1 = row.insertCell(0);
             var cell2 = row.insertCell(1);
 
             // Add some text to the new cells:
-            cell1.innerHTML = path;
+            cell1.innerHTML = stringPath;
             cell2.innerHTML = 0;
           }
           setTimeout(function () {
