@@ -1,13 +1,13 @@
 from nba_analysis.analysis.positions import classify_player_position
 from nba_analysis.analysis.tiers import cluster as tier_cluster
 from nba_analysis.analysis.styles import cluster as style_cluster
+from nba_analysis.analysis.passing import get_passing_info
 from nba_analysis import config
 
 from flask import Flask, render_template, request, jsonify, json
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 
-#import json
 import pandas as pd
 import os
 
@@ -44,11 +44,24 @@ def positions():
 def styles():
     return render_template('styles.html')
 
+@app.route('/passing')
+def passing():
+    return render_template('passing.html')
+
 @app.route('/_get_all_names')
 def get_all_names():
     df = get_data_source('career_data')
     names_json = [{'name':name} for name in df['name'].unique()]
     return json.dumps(names_json)
+
+@app.route('/_get_passing')
+def get_passing():
+    team = request.args.get('team')
+
+    df = get_data_source('passing_data')
+    graph_json, shots = get_passing_info(df, team)
+    packaged_json = {'graph' : graph_json, 'shot_probs': shots}
+    return json.dumps(packaged_json)
 
 @app.route('/_get_positions')
 def get_positions():

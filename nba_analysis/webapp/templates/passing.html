@@ -1,0 +1,339 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}NBA Analysis{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
+<head>
+  <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js'></script>
+  <script type='text/javascript'>
+    // Big thanks to http://www.coppelia.io/2014/07/an-a-to-z-of-extra-features-for-the-d3-force-layout/ for guiding me through visualization improvements
+
+    var w = 800,
+        h = 500;
+
+    function drawGraph() {
+      // Remove the previous svg
+      d3.select('svg').remove();
+      d3.select('#numPossesions').remove();
+      d3.select('#simulateButton').remove();
+      var possessionsLog = document.getElementById('log');
+      while (possessionsLog.rows.length > 1) {
+        possessionsLog.deleteRow(1);
+      }
+
+      var vis = d3.select('#chart')
+        .append('svg:svg')
+          .attr('width', w)
+          .attr('height', h);
+
+      var teamSelect = document.getElementById('team');
+      var team = teamSelect.options[teamSelect.selectedIndex].text;
+      var url = '/_get_passing?team=' + team;
+      d3.json(url, function(passing_data) {
+        var graph = passing_data['graph'];
+        var visibleLinks = [];
+        graph.nodes.forEach(function (n) {
+          n.group = 0;
+        });
+
+        // Manually add shot nodes
+        graph.nodes.push({'group':0, 'id':'Shot Make'});
+        graph.nodes.push({'group':0, 'id':'Shot Miss'});
+        graph.nodes.forEach(function (n) {
+          if (n.id != 'Shot Make' && n.id != 'Shot Miss') {
+            graph.links.push({'label':0, 'source':n, 'target':graph.nodes[graph.nodes.length-1]});
+            graph.links.push({'label':0, 'source':n, 'target':graph.nodes[graph.nodes.length-2]});
+          }
+        });
+
+        var force = d3.layout.force()
+            .charge(-1000)
+            .linkDistance(250)
+            .nodes(graph.nodes)
+            .links(graph.links)
+            .size([w, h])
+            .start();
+
+        var link = vis.selectAll('line.link')
+            .data(visibleLinks)
+          .enter().append('svg:line')
+            .attr('class', 'link')
+            .style('stroke-width', 1)
+            .style("marker-end",  "url(#suit)");
+
+        var nodes = vis.selectAll('.node')
+          .data(graph.nodes)
+          .enter().append('g')
+          .attr('class', 'node')
+          .call(force.drag);
+
+        nodes.append('circle')
+          .attr('r', 10)
+          .attr('cx', function(d) { return d.x; })
+          .attr('cy', function(d) { return d.y; });
+
+        nodes.append('text')
+          .attr('dx', 10)
+          .attr('dy', '.35em')
+          .text(function(d) { return d.id });
+
+        vis.style('opacity', 1e-6)
+          .transition()
+            .duration(1000)
+            .style('opacity', 1);
+
+        vis.append("defs").selectAll("marker")
+          .data(["suit"])
+        .enter().append("marker")
+          .attr("id", function(d) { return d; })
+          .attr("viewBox", "0 -5 10 10")
+          .attr("refX", 25)
+          .attr("refY", 0)
+          .attr("markerWidth", 6)
+          .attr("markerHeight", 6)
+          .attr("orient", "auto")
+        .append("path")
+          .attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
+          .style("stroke", "#4679BD")
+          .style("opacity", "0.6");
+
+        force.on('tick', function() {
+          link.attr('x1', function(d) { return d.source.x; })
+              .attr('y1', function(d) { return d.source.y; })
+              .attr('x2', function(d) { return d.target.x; })
+              .attr('y2', function(d) { return d.target.y; });
+
+          d3.selectAll('circle')
+            .attr('cx', function (d) {
+              return d.x;
+            })
+            .attr('cy', function (d) {
+              return d.y;
+            })
+            .style('fill', function (d) {
+              if (d.group === 0) {
+                return 'rgb(31, 119, 180)';
+              }
+              else {
+                return 'rgb(255, 127, 14)'
+              }
+            });
+
+          d3.selectAll('text')
+            .attr('x', function (d) {
+              return d.x;
+            })
+            .attr('y', function (d) {
+              return d.y;
+            });
+        });
+
+        //Restart the visualisation after any node and link changes
+        function restart() {
+          link = link.data(visibleLinks);
+          link.exit().remove();
+          link.enter().insert("svg:line", ".node").attr("class", "link").style("marker-end",  "url(#suit)");
+          nodes = nodes.data(graph.nodes);
+          nodes.exit().remove();
+          nodes.enter().insert("circle", ".cursor")
+            .attr("r", 10)
+            .call(force.drag);
+          force.start();
+        }
+
+        function findPath() {
+          var path = [];
+          var source = Math.floor(Math.random() * (graph.nodes.length - 2));
+          path.push(source);
+          var prev = -1;
+          while (source < graph.nodes.length - 2) {
+            if (prev != -1) {
+              rnd = Math.random();
+              temp1 = graph.nodes[prev].id;
+              temp2 = graph.nodes[source].id;
+              probs = passing_data['shot_probs'].find( a => a[0] === temp1 && a[1] === temp2).slice(2);
+              idx = probs.findIndex( a => (rnd -= a) < 0);
+              if (idx > -1) {
+                source = graph.nodes.length - 2 + idx;
+                path.push(source);
+                break;
+              }
+            }
+            var potentialLinks = graph.links.filter(function (d) {
+              return d.source.index === source;
+            });
+            var linkProbs = potentialLinks.map(function (l) {
+              return l.label;
+            });
+            rnd = Math.random();
+            idx = linkProbs.findIndex( a => (rnd -= a) < 0 );
+            prev = source;
+            source = potentialLinks[idx].target.index;
+            path.push(source);
+          }
+          return path;
+        }
+
+        function runPossession(path) {
+          visibleLinks = [];
+          var i = 0;
+
+          graph.nodes.forEach(function (n) {
+            if (n.index === path[0]) {
+              n.group = 1;
+            }
+            else {
+              n.group = 0;
+            }
+          });
+          restart();
+
+          function loop() {
+            setTimeout(function () {
+              graph.links.forEach(function (l) {
+                if (l.source.index === path[i] && l.target.index === path[i+1]) {
+                  visibleLinks.push(l);
+                }
+              });
+              graph.nodes.forEach(function (n) {
+                if (n.index === path[i+1]) {
+                  n.group = 1;
+                }
+              });
+              restart();
+              i++;
+              if (i < path.length - 1) {
+                loop();
+              }
+            }, 1000);
+          }
+          loop();
+        }
+
+        function runSimulation() {
+          var possessionsInput = document.getElementById('numPossesions');
+          var numPossesions = parseInt(possessionsInput.value);
+
+          document.getElementById('simulateButton').disabled = true;
+
+          for (count = 0; count < numPossesions; count++) {
+            var path = findPath();
+            if (count === 0) {
+              runPossession(path);
+            }
+            var stringPath = path.map(function (n) {
+              return graph.nodes[n].id;
+            }).join('-->');
+
+            var possessionsLog = document.getElementById('log');
+            var row = possessionsLog.insertRow(1);
+            var cell1 = row.insertCell(0);
+
+            // Add some text to the new cells:
+            cell1.innerHTML = stringPath;
+          }
+          setTimeout(function () {
+            document.getElementById('simulateButton').disabled = false;
+          }, 5000);
+        }
+
+        d3.select('#chartDetail')
+          .append('input')
+          .attr('type', 'number')
+          .attr('id', 'numPossesions')
+          .attr('min', '1')
+          .attr('max', '200')
+          .attr('value', '1');
+
+        d3.select('#chartDetail')
+          .append('button')
+          .attr('type', 'button')
+          .attr('id', 'simulateButton')
+          .text('Simulate')
+          .on('click', runSimulation);
+      });
+    }
+  </script>
+  <style>
+    circle.node {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+
+    line.link {
+      stroke: #999;
+      stroke-opacity: .6;
+    }
+
+    .node text {
+      font: 9px helvetica;
+    }
+  </style>
+</head>
+<body>
+  <div class='container-fluid'>
+    <div class='row'>
+      <div class='col-sm-2'>
+        <h4>
+            Settings
+          </h4>
+        <div class='input-group' style='padding-bottom:5px;width:200px;'>
+          <select class='form-control' id='team'>
+            <option>Atlanta Hawks</option>
+            <option>Boston Celtics</option>
+            <option>Brooklyn Nets</option>
+            <option>Charlotte Hornets</option>
+            <option>Chicago Bulls</option>
+            <option>Cleveland Cavaliers</option>
+            <option>Dallas Mavericks</option>
+            <option>Denver Nuggets</option>
+            <option>Detroit Pistons</option>
+            <option>Golden State Warriors</option>
+            <option>Houston Rockets</option>
+            <option>Indiana Pacers</option>
+            <option>LA Clippers</option>
+            <option>Los Angeles Lakers</option>
+            <option>Memphis Grizzlies</option>
+            <option>Miami Heat</option>
+            <option>Milwaukee Bucks</option>
+            <option>Minnesota Timberwolves</option>
+            <option>New Orleans Pelicans</option>
+            <option>New York Knicks</option>
+            <option>Oklahoma City Thunder</option>
+            <option>Orlando Magic</option>
+            <option>Philadelphia 76ers</option>
+            <option>Phoenix Suns</option>
+            <option>Portland Trail Blazers</option>
+            <option>Sacramento Kings</option>
+            <option>San Antonio Spurs</option>
+            <option>Toronto Raptors</option>
+            <option>Utah Jazz</option>
+            <option>Washington Wizards</option>
+          </select>
+        </div>
+        <button class='btn btn-primary' onclick='drawGraph()'>Load Analysis</button>
+      </div>
+    </div>
+    <div class='row'>
+    <div class='col-sm-6' id='chart' style='height:500px;width:800px'>
+    </div>
+    <div class='col-sm-3' id='chartDetail'>
+    </div>
+    </div>
+    <div class='row'>
+      <div class='col-sm-8'>
+        <div class='container' style='height:300px;overflow:auto;''>
+          <table class='table' id='log'>
+            <thead>
+              <tr>
+                <th>Path</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+{% endblock %}
