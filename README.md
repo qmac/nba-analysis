@@ -9,6 +9,9 @@ Summary
 
 **tiers**: clustering NBA players into tiers using the k-means clustering algorithm on advanced statistics
 
+
+Check out the [deployed web app] (http://nba-analysis.herokuapp.com/).
+
 Data
 -------------------
 All the data was scraped from the [NBA's publicly available stats] (http://stats.nba.com/)
