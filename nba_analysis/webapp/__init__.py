@@ -59,8 +59,9 @@ def get_passing():
     team = request.args.get('team')
 
     df = get_data_source('passing_data')
-    graph_json = get_passing_info(df, team)
-    return json.dumps(graph_json)
+    graph_json, shots = get_passing_info(df, team)
+    packaged_json = {'graph' : graph_json, 'shot_probs': shots}
+    return json.dumps(packaged_json)
 
 @app.route('/_get_positions')
 def get_positions():

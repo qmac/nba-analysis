@@ -30,10 +30,21 @@
       var teamSelect = document.getElementById('team');
       var team = teamSelect.options[teamSelect.selectedIndex].text;
       var url = '/_get_passing?team=' + team;
-      d3.json(url, function(graph) {
+      d3.json(url, function(passing_data) {
+        var graph = passing_data['graph'];
         var visibleLinks = [];
         graph.nodes.forEach(function (n) {
           n.group = 0;
+        });
+
+        // Manually add shot nodes
+        graph.nodes.push({'group':0, 'id':'Shot Make'});
+        graph.nodes.push({'group':0, 'id':'Shot Miss'});
+        graph.nodes.forEach(function (n) {
+          if (n.id != 'Shot Make' && n.id != 'Shot Miss') {
+            graph.links.push({'label':0, 'source':n, 'target':graph.nodes[graph.nodes.length-1]});
+            graph.links.push({'label':0, 'source':n, 'target':graph.nodes[graph.nodes.length-2]});
+          }
         });
 
         var force = d3.layout.force()
@@ -133,9 +144,22 @@
 
         function findPath() {
           var path = [];
-          var source = Math.floor(Math.random() * graph.nodes.length);
+          var source = Math.floor(Math.random() * (graph.nodes.length - 2));
           path.push(source);
-          while (source != 5) {
+          var prev = -1;
+          while (source < graph.nodes.length - 2) {
+            if (prev != -1) {
+              rnd = Math.random();
+              temp1 = graph.nodes[prev].id;
+              temp2 = graph.nodes[source].id;
+              probs = passing_data['shot_probs'].find( a => a[0] === temp1 && a[1] === temp2).slice(2);
+              idx = probs.findIndex( a => (rnd -= a) < 0);
+              if (idx > -1) {
+                source = graph.nodes.length - 2 + idx;
+                path.push(source);
+                break;
+              }
+            }
             var potentialLinks = graph.links.filter(function (d) {
               return d.source.index === source;
             });
@@ -144,6 +168,7 @@
             });
             rnd = Math.random();
             idx = linkProbs.findIndex( a => (rnd -= a) < 0 );
+            prev = source;
             source = potentialLinks[idx].target.index;
             path.push(source);
           }
@@ -204,11 +229,9 @@
             var possessionsLog = document.getElementById('log');
             var row = possessionsLog.insertRow(1);
             var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
 
             // Add some text to the new cells:
             cell1.innerHTML = stringPath;
-            cell2.innerHTML = 0;
           }
           setTimeout(function () {
             document.getElementById('simulateButton').disabled = false;
@@ -304,8 +327,7 @@
           <table class='table' id='log'>
             <thead>
               <tr>
-                <th>Passing Path</th>
-                <th>Result</th>
+                <th>Path</th>
               </tr>
             </thead>
           </table>
