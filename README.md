@@ -1,6 +1,8 @@
 NBA Data Analysis
 ===============
 
+Check out the [deployed web app](http://nba-analysis.herokuapp.com/).
+
 Summary
 -------------------
 **positions**: classifying NBA players into positions using a KNearestNeighbors classifier on season statistics
@@ -9,12 +11,9 @@ Summary
 
 **tiers**: clustering NBA players into tiers using the k-means clustering algorithm on advanced statistics
 
-
-Check out the [deployed web app] (http://nba-analysis.herokuapp.com/).
-
 Data
 -------------------
-All the data was scraped from the [NBA's publicly available stats] (http://stats.nba.com/)
+All the data was scraped from the [NBA's publicly available stats](http://stats.nba.com/)
 
 
 Getting Started
