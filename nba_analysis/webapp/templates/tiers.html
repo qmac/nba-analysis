@@ -52,33 +52,11 @@
         if(tiers.indexOf(player_name) > -1 || player_name === 'vis') {
           return '';
         }
-        switch (player_name) {
-          case 'Nene Hilario':
-            player_name = 'nene';
-            break;
-          case 'Tim Hardaway':
-            player_name = 'tim_hardaway_jr';
-            break;
-          case 'Jose Juan Barea':
-            player_name = 'jose_barea';
-            break;
-          case 'Kelly Oubre':
-            player_name = 'default_nba_headshot_v2';
-            break;
-          case 'Larry Nance Jr.':
-            player_name = 'larry_nance';
-            break;
-        }
-
-        return player_name.toLowerCase().replace(/\s/g, '_').replace(/\./g, '').replace('\'', ''); 
+        return player_name; 
       }
 
       var filePath = function(player_name) {
-        var encoded = encodedName(player_name)
-        if(encoded === '') {
-          return;
-        }
-        return 'http://i.cdn.turner.com/nba/nba/.element/img/2.0/sect/statscube/players/large/' + encoded + '.png';
+        return 'https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/' + player_name + '.png';
       }
 
       var margin = 10,
@@ -116,16 +94,16 @@
         var filter = svg.append('defs').selectAll('filter')
           .data(nodes)
         .enter().append('filter')
-        .attr('id', function(d) { return encodedName(d.name); })
+        .attr('id', function(d) { return filePath(d.id); })
         .append('feImage')
-        .attr('xlink:href', function(d) { return filePath(d.name) })
+        .attr('xlink:href', function(d) { return filePath(d.id) })
 
         var circle = svg.selectAll('circle')
             .data(nodes)
           .enter().append('circle')
             .attr('class', function(d) { return d.parent ? d.children ? 'node' : 'node node--leaf' : 'node node--root'; })
             .attr('filter', function(d) {
-              return d.size === 2000 ? 'url(#' + encodedName(d.name) + ')' : null; 
+              return d.size === 2000 ? 'url(#' + filePath(d.id) + ')' : null; 
             })
             .style('fill', function(d) { return d.children ? color(d.depth) : null; })
             .style('display', function(d) { return d.parent === root ? null : 'none'; })
