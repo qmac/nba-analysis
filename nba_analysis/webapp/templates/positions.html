@@ -25,6 +25,7 @@
   <script type='text/javascript' src='static/radar/radar-chart.js'></script>
   <script type='text/javascript'>
     RadarChart.defaultConfig.radius = 1;
+    var chartData;
 
     function getPlayers() {
       d3.json('/_get_all_names', function(data) {
@@ -34,9 +35,9 @@
       });
     }
 
-    function drawCharts() {
-      // Remove the previous player's charts from the DOM
+    function runAnalysis() {
       d3.selectAll('.chart').remove();
+      d3.selectAll('#year').remove();
 
       // Get the player selected in the drop down
       var player_select = document.getElementById('players');
@@ -49,14 +50,28 @@
       // Draw that player's radar chart
       var url = '/_get_positions?player=' + player + '&algorithm=' + algorithm;
       d3.json(url, function(data) {
-        for (var i=0;i<data.length;i++) {
-          var name = 'chart' + data[i]['className'];
-          d3.select('#results').append('div').attr('id', name).attr('class', 'chart');
-
-          var arr = [data[i]];
-          RadarChart.draw('#'+name, arr);
-        }
+        d3.select('#results').append('input')
+            .attr('type', 'range')
+            .attr('id', 'year')
+            .attr('min', 0)
+            .attr('max', data.length-1)
+            .attr('step', 1)
+            .attr('oninput', 'drawChart()');
+        chartData = data;
+        drawChart();
       });
+    }
+
+    function drawChart() {
+      // Remove the previous player's charts from the DOM
+      d3.selectAll('.chart').remove();
+      i = document.getElementById('year').value;
+
+      var name = 'chart' + chartData[i]['className'];
+      d3.select('#results').append('div').attr('id', name).attr('class', 'chart');
+
+      var arr = [chartData[i]];
+      RadarChart.draw('#'+name, arr);
     }
   </script>
 </head>
@@ -79,7 +94,7 @@
               <option>DecisionTreeClassifier</option>
             </select>
           </div>
-          <button class='btn btn-primary' onclick='drawCharts()'>Run Analysis</button>
+          <button class='btn btn-primary' onclick='runAnalysis()'>Run Analysis</button>
         </div>
         <div class='col-sm-6' id='results'/>
     </div>
