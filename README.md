@@ -5,6 +5,8 @@ Check out the [deployed web app](http://nba-analysis.herokuapp.com/).
 
 Summary
 -------------------
+**passing**: creating a graph from player passing data, random walks to simulate possessions done on the frontend
+
 **positions**: classifying NBA players into positions using a KNearestNeighbors classifier on season statistics
 
 **styles**: clustering NBA teams and players based on their play styles determined by the frequencies of play types
