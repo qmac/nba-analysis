@@ -17,6 +17,8 @@
       d3.select('svg').remove();
       d3.select('#numPossesions').remove();
       d3.select('#simulateButton').remove();
+      d3.select('#usageClusters').remove();
+      d3.select('#passingClusters').remove();
       var possessionsLog = document.getElementById('log');
       while (possessionsLog.rows.length > 1) {
         possessionsLog.deleteRow(1);
@@ -252,6 +254,31 @@
           .attr('id', 'simulateButton')
           .text('Simulate')
           .on('click', runSimulation);
+
+        function clusters(type) {
+          var url = '/_get_pass_clusters?team=' + team + '&type=' + type;
+          d3.json(url, function(cluster_data) {
+            console.log(cluster_data);
+          });
+        }
+
+        d3.select('#chartDetail')
+          .append('button')
+          .attr('type', 'button')
+          .attr('id', 'usageClusters')
+          .text('Usage Clusters')
+          .on('click', function(d){
+            clusters('usage')
+          });
+
+        d3.select('#chartDetail')
+          .append('button')
+          .attr('type', 'button')
+          .attr('id', 'passingClusters')
+          .text('Passing Clusters')
+          .on('click', function(d){
+            clusters('passing')
+          });
       });
     }
   </script>
