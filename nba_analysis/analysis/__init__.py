@@ -4,6 +4,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 
+
 def compare_classifiers(data, targets):
     classifiers = ['GaussianNB', 'SVC', 'KNeighborsClassifier', 'DecisionTreeClassifier']
     max_score = 0

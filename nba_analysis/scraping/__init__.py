@@ -1,33 +1,49 @@
 import os
 import requests
+import urllib
 import pandas as pd
 
 from nba_analysis import config
 from nba_analysis.webapp import db_engine
 
+
+headers = {
+    'user-agent': 'Mozilla/5.0',
+    'referer': 'http://stats.nba.com/scores/'
+}
+
+
 def scrape(url):
     try:
-        response_json = requests.get(url, headers={'user-agent': 'Mozilla/5.0', 'referer': 'http://stats.nba.com/scores/'}).json()
-        headers = response_json['resultSets'][0]['headers']
+        response_json = requests.get(url, headers=headers).json()
+        heads = response_json['resultSets'][0]['headers']
         data = response_json['resultSets'][0]['rowSet']
-        return headers, data
-    except:
-        print 'Encountered exception while scraping'
+        return heads, data
+    except Exception as e:
+        print 'Encountered exception while scraping: ' + e.message
+
 
 def scrape_synergy(url, num_retries=10):
     for i in range(num_retries):
         try:
-            response_json = requests.get(url, headers={'user-agent': 'Mozilla/5.0', 'referer': 'http://stats.nba.com/scores/'}).json()
+            response_json = requests.get(url, headers=headers).json()
             players = response_json['results']
             return players
-        except:
-            print 'Encountered exception while scraping'
+        except Exception as e:
+            print 'Encountered exception while scraping: ' + e.message
+
 
 def scrape_players(indices, current_season_only=True):
-    players_url = 'http://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=%s&IsOnlyCurrentSeason=%d' % (config.current_year, current_season_only)
+    params = urllib.urlencode({
+        'LeagueID': '00',
+        'Season': config.current_year,
+        'IsOnlyCurrentSeason': int(current_season_only)
+    })
+    players_url = 'http://stats.nba.com/stats/commonallplayers?%s' % (params)
     players = scrape(players_url)[1]
     players = [[player[i] for i in indices] for player in players]
     return players
+
 
 def write_to_data_source(data, headers, table_name):
     df = pd.DataFrame(data=data, columns=headers)

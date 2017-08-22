@@ -6,33 +6,34 @@ from sklearn.tree import DecisionTreeClassifier
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import sys
 
-FEATURE_COLUMNS = ['FGM', 
-                'FGA', 
-                'FG3M', 
-                'FG3A', 
-                'FTM', 
-                'FTA',
-                'OREB',
-                'REB',
-                'AST',
-                'STL',
-                'TOV',
-                'BLK', 
-                'PF',
-                'PTS'
-                ]
+FEATURE_COLUMNS = ['FGM',
+                   'FGA',
+                   'FG3M',
+                   'FG3A',
+                   'FTM',
+                   'FTA',
+                   'OREB',
+                   'REB',
+                   'AST',
+                   'STL',
+                   'TOV',
+                   'BLK',
+                   'PF',
+                   'PTS'
+                   ]
 
 CLASS_COLUMN = 'position'
 
+
 def predictions_to_json(predictions):
     axes = ['G', 'G-F', 'F-G', 'F-C', 'C-F', 'C', 'F']
-    seasons = [{'className': row[1]['season'], 
-                'axes':[{'axis': axis, 'value': row[1][axis]} for axis in axes]} 
-                for row in predictions.iterrows()]
+    seasons = [{'className': row[1]['season'],
+                'axes':[{'axis': axis, 'value': row[1][axis]} for axis in axes]}
+               for row in predictions.iterrows()]
     return seasons
+
 
 def classify_player_position(df, player_name, algorithm='SVC'):
     df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
@@ -53,11 +54,12 @@ def classify_player_position(df, player_name, algorithm='SVC'):
     prediction_df['season'] = np.array(testing['SEASON_ID'])
     return predictions_to_json(prediction_df)
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print 'Usage: python positions.py player_name'
         exit(-1)
-    
+
     df = pd.DataFrame.from_csv('./../data/career_data.csv')
     df = df.dropna(subset=FEATURE_COLUMNS+[CLASS_COLUMN])
     data = df[FEATURE_COLUMNS]
@@ -65,4 +67,3 @@ if __name__ == '__main__':
     alg, score = compare_classifiers(data, targets)
     print 'Using %s which got an accuracy of %f' % (alg, score)
     print classify_player_position(df, sys.argv[1], algorithm=alg)
-

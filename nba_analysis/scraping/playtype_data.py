@@ -1,15 +1,14 @@
 import sys
-import pandas as pd
 
 from nba_analysis.scraping import scrape_synergy, write_to_data_source
 
+
 def scrape_playtypes(play_types):
-    df = pd.DataFrame(columns=play_types)
     player_dicts = {}
     for play_type in play_types:
         url = 'http://stats-prod.nba.com/wp-json/statscms/v1/synergy/player/?category=%s&limit=500&names=offensive&q=2475619&season=2016&seasonType=Reg' % play_type
         players = scrape_synergy(url)
-        
+
         for player in players:
             if isinstance(player['PlayerLastName'], (int, long)):
                 continue
@@ -23,12 +22,15 @@ def scrape_playtypes(play_types):
     data = [[p[0]] + [p[1][h] if h in p[1] else 0 for h in headers[1:]] for p in player_dicts.items()]
     return headers, data
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 1:
         print 'Usage: python platype_data.py'
         exit(-1)
-    
-    headers, data = scrape_playtypes(['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
-                'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound'])
+
+    headers, data = scrape_playtypes(['Transition', 'Isolation',
+                                      'PRBallHandler', 'PRRollMan',
+                                      'Postup', 'Spotup', 'Handoff',
+                                      'Cut', 'OffScreen', 'OffRebound'])
     write_to_data_source(data, headers, 'playtype_data')
     print 'Finished updating playtype data in db'

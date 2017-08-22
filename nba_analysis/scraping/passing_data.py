@@ -3,6 +3,7 @@ from nba_analysis import config
 
 import sys
 
+
 def scrape_passing(players):
     data = []
     for player in players:
@@ -15,17 +16,18 @@ def scrape_passing(players):
         '&PaceAdjust=N&PerMode=Totals&PlayerExperience&PlayerPosition&PlusMinus=N&Rank=N&Season=%s'\
         '&SeasonSegment&SeasonType=Regular+Season&ShotClockRange&StarterBench&TeamID=0&VsConference'\
         '&VsDivision&Weight' % (player_id, config.current_year)
-        
+
         headers, player_data = scrape(passing_url)
         data.extend(player_data)
 
     return headers, data
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 1:
         print 'Usage: python passing_data.py'
         exit(-1)
-    
+
     players = scrape_players([0])
     headers, data = scrape_passing(players)
     write_to_data_source(data, headers, 'passing_data')

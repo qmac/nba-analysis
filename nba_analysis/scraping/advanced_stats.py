@@ -1,7 +1,7 @@
 import sys
-import pandas as pd
 
 from nba_analysis.scraping import scrape, write_to_data_source
+
 
 def scrape_advanced(years):
     all_data = []
@@ -21,11 +21,12 @@ def scrape_advanced(years):
 
     return headers, all_data
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 1:
         print 'Usage: python advanced_stats.py'
         exit(-1)
-    
+
     headers, data = scrape_advanced(['2014-15', '2015-16', '2016-17'])
     write_to_data_source(data, headers, 'advanced_stats')
     print 'Finished updating advanced stats in db'

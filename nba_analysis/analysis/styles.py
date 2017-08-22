@@ -1,13 +1,13 @@
 from sklearn.cluster import AffinityPropagation
 import pandas as pd
-import json
 import sys
 
-FEATURES = ['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan', 
+FEATURES = ['Transition', 'Isolation', 'PRBallHandler', 'PRRollMan',
             'Postup', 'Spotup', 'Handoff', 'Cut', 'OffScreen', 'OffRebound']
 
-# Converts clusters into dictionary compatible for visualization
+
 def clusters_to_json(df, scope):
+    # Converts clusters into dictionary compatible for visualization
     vectors_df = df[FEATURES]
     results = {}
     results['cols'] = FEATURES
@@ -30,8 +30,9 @@ def clusters_to_json(df, scope):
 
     return results
 
-# Performs clustering
+
 def cluster(df, scope):
+    # Performs clustering
     # Manipulate data into scope
     if scope == 'Team':
         df = df.drop('Player', 1).groupby('Team', as_index=False).mean()
@@ -52,10 +53,11 @@ def cluster(df, scope):
     # Convert results to JSON for frontend
     return clusters_to_json(df, scope)
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print 'Usage: python styles.py scope'
         exit(-1)
-    
+
     df = pd.DataFrame.from_csv('./../data/playtype_data.csv')
     print cluster(df, sys.argv[1])

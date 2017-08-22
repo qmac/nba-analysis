@@ -2,6 +2,7 @@ import sys
 
 from nba_analysis.scraping import scrape, scrape_players, write_to_data_source
 
+
 def scrape_career(players):
     data = []
     for player in players:
@@ -20,11 +21,12 @@ def scrape_career(players):
 
     return headers, data
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 1:
         print 'Usage: python career_stats.py'
         exit(-1)
-    
+
     players = scrape_players([0, 1], current_season_only=False)
     headers, data = scrape_career(players)
     write_to_data_source(data, headers, 'career_data')
