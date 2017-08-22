@@ -1,14 +1,14 @@
+import sys
+
+from tqdm import tqdm
 from nba_analysis.scraping import scrape, scrape_players, write_to_data_source
 from nba_analysis import config
-
-import sys
 
 
 def scrape_passing(players):
     data = []
-    for player in players:
+    for player in tqdm(players):
         player_id = player[0]
-        print player_id
 
         passing_url = 'http://stats.nba.com/stats/playerdashptpass?College&Conference&Country&DateFrom'\
         '&DateTo&Division&DraftPick&DraftYear&PlayerID=%s&GameScope&GameSegment&Height&LastNGames=0'\

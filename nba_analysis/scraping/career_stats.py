@@ -1,13 +1,13 @@
 import sys
 
+from tqdm import tqdm
 from nba_analysis.scraping import scrape, scrape_players, write_to_data_source
 
 
 def scrape_career(players):
     data = []
-    for player in players:
+    for player in tqdm(players):
         player_id, name = player[0], player[1]
-        print player_id, name
 
         player_url = "http://stats.nba.com/stats/commonplayerinfo?LeagueID=00&PlayerID=%s" % (player_id)
         player_info = scrape(player_url)[1]

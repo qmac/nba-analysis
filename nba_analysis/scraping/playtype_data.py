@@ -1,11 +1,12 @@
 import sys
 
+from tqdm import tqdm
 from nba_analysis.scraping import scrape_synergy, write_to_data_source
 
 
 def scrape_playtypes(play_types):
     player_dicts = {}
-    for play_type in play_types:
+    for play_type in tqdm(play_types):
         url = 'http://stats-prod.nba.com/wp-json/statscms/v1/synergy/player/?category=%s&limit=500&names=offensive&q=2475619&season=2016&seasonType=Reg' % play_type
         players = scrape_synergy(url)
 

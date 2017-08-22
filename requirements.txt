@@ -10,3 +10,5 @@ flask-sqlalchemy
 psycopg2
 flask-bootstrap
 networkx
+urllib
+tqdm
