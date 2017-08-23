@@ -12,6 +12,8 @@
     var w = 800,
         h = 500;
 
+    var color = d3.scale.category20().domain(d3.range(0, 20));
+
     function drawGraph() {
       // Remove the previous svg
       d3.select('svg').remove();
@@ -114,8 +116,11 @@
               return d.y;
             })
             .style('fill', function (d) {
-              if (d.group === 0) {
-                return 'rgb(31, 119, 180)';
+              if (d.group === 1) {
+                return color(42);
+              }
+              else if (d.group < 42) {
+                return color(d.group);
               }
               else {
                 return 'rgb(255, 127, 14)'
@@ -183,7 +188,7 @@
 
           graph.nodes.forEach(function (n) {
             if (n.index === path[0]) {
-              n.group = 1;
+              n.group = 42;
             }
             else {
               n.group = 0;
@@ -200,7 +205,7 @@
               });
               graph.nodes.forEach(function (n) {
                 if (n.index === path[i+1]) {
-                  n.group = 1;
+                  n.group = 42;
                 }
               });
               restart();
@@ -258,7 +263,18 @@
         function clusters(type) {
           var url = '/_get_pass_clusters?team=' + team + '&type=' + type;
           d3.json(url, function(cluster_data) {
+            assignments = cluster_data['clusters'];
             console.log(cluster_data);
+            graph.nodes.forEach(function (n, i) {
+              if (i < assignments.length) {
+                n.group = assignments[i] + 2;
+                console.log(n.group);
+              }
+              else {
+                n.group = 0;
+              }
+              restart();
+            });
           });
         }
 
