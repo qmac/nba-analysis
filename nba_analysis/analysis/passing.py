@@ -2,6 +2,7 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.readwrite import json_graph
+from sklearn.cluster import AffinityPropagation, SpectralClustering
 
 import sys
 
@@ -36,6 +37,30 @@ def get_passing_info(df, team):
     df = df[df['TEAM_NAME'] == team]
     g, shots = construct_graph(df)
     return json_graph.node_link_data(g), shots
+
+
+def get_usage_clusters(df, team):
+    df = df[df['TEAM_NAME'] == team]
+    g = construct_graph(df)[0]
+    mat = nx.adjacency_matrix(g, nodelist=None, weight='label')
+    mat = 1 - mat.todense()
+
+    clstr = AffinityPropagation()
+    res = clstr.fit(mat)
+
+    return res.labels_
+
+
+def get_passing_clusters(df, team):
+    df = df[df['TEAM_NAME'] == team]
+    g = construct_graph(df)[0]
+    mat = nx.adjacency_matrix(g, nodelist=None, weight='label')
+    mat = 1 - mat.todense()
+
+    clstr = SpectralClustering(n_clusters=3, affinity='precomputed')
+    res = clstr.fit(mat)
+
+    return res.labels_
 
 
 if __name__ == '__main__':

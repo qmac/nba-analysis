@@ -12,11 +12,15 @@
     var w = 800,
         h = 500;
 
+    var color = d3.scale.category20().domain(d3.range(0, 20));
+
     function drawGraph() {
       // Remove the previous svg
       d3.select('svg').remove();
       d3.select('#numPossesions').remove();
       d3.select('#simulateButton').remove();
+      d3.select('#usageClusters').remove();
+      d3.select('#passingClusters').remove();
       var possessionsLog = document.getElementById('log');
       while (possessionsLog.rows.length > 1) {
         possessionsLog.deleteRow(1);
@@ -112,8 +116,11 @@
               return d.y;
             })
             .style('fill', function (d) {
-              if (d.group === 0) {
-                return 'rgb(31, 119, 180)';
+              if (d.group === 1) {
+                return color(42);
+              }
+              else if (d.group < 42) {
+                return color(d.group);
               }
               else {
                 return 'rgb(255, 127, 14)'
@@ -181,7 +188,7 @@
 
           graph.nodes.forEach(function (n) {
             if (n.index === path[0]) {
-              n.group = 1;
+              n.group = 42;
             }
             else {
               n.group = 0;
@@ -198,7 +205,7 @@
               });
               graph.nodes.forEach(function (n) {
                 if (n.index === path[i+1]) {
-                  n.group = 1;
+                  n.group = 42;
                 }
               });
               restart();
@@ -216,6 +223,8 @@
           var numPossesions = parseInt(possessionsInput.value);
 
           document.getElementById('simulateButton').disabled = true;
+          document.getElementById('usageClusters').disabled = true;
+          document.getElementById('passingClusters').disabled = true;
 
           for (count = 0; count < numPossesions; count++) {
             var path = findPath();
@@ -235,6 +244,8 @@
           }
           setTimeout(function () {
             document.getElementById('simulateButton').disabled = false;
+            document.getElementById('usageClusters').disabled = false;
+            document.getElementById('passingClusters').disabled = false;
           }, 5000);
         }
 
@@ -252,6 +263,41 @@
           .attr('id', 'simulateButton')
           .text('Simulate')
           .on('click', runSimulation);
+
+        function clusters(type) {
+          var url = '/_get_pass_clusters?team=' + team + '&type=' + type;
+          d3.json(url, function(cluster_data) {
+            assignments = cluster_data['clusters'];
+            graph.nodes.forEach(function (n, i) {
+              if (i < assignments.length) {
+                n.group = assignments[i] + 2;
+              }
+              else {
+                n.group = 0;
+              }
+              visibleLinks = [];
+              restart();
+            });
+          });
+        }
+
+        d3.select('#chartDetail')
+          .append('button')
+          .attr('type', 'button')
+          .attr('id', 'usageClusters')
+          .text('Usage Clusters')
+          .on('click', function(d){
+            clusters('usage')
+          });
+
+        d3.select('#chartDetail')
+          .append('button')
+          .attr('type', 'button')
+          .attr('id', 'passingClusters')
+          .text('Passing Clusters')
+          .on('click', function(d){
+            clusters('passing')
+          });
       });
     }
   </script>

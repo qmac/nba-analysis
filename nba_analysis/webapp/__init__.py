@@ -1,7 +1,9 @@
 from nba_analysis.analysis.positions import classify_player_position
 from nba_analysis.analysis.tiers import cluster as tier_cluster
 from nba_analysis.analysis.styles import cluster as style_cluster
-from nba_analysis.analysis.passing import get_passing_info
+from nba_analysis.analysis.passing import (get_passing_info,
+                                           get_usage_clusters,
+                                           get_passing_clusters)
 from nba_analysis import config
 
 from flask import Flask, render_template, request, json
@@ -70,6 +72,20 @@ def get_passing():
     graph_json, shots = get_passing_info(df, team)
     packaged_json = {'graph': graph_json, 'shot_probs': shots}
     return json.dumps(packaged_json)
+
+
+@app.route('/_get_pass_clusters')
+def get_pass_clusters():
+    clst_type = request.args.get('type')
+    team = request.args.get('team')
+    df = get_data_source('passing_data')
+
+    if clst_type == 'usage':
+        results = get_usage_clusters(df, team)
+    elif clst_type == 'passing':
+        results = get_passing_clusters(df, team)
+    results = {'clusters': results.tolist()}
+    return json.dumps(results)
 
 
 @app.route('/_get_positions')
