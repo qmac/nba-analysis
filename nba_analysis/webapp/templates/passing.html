@@ -223,6 +223,8 @@
           var numPossesions = parseInt(possessionsInput.value);
 
           document.getElementById('simulateButton').disabled = true;
+          document.getElementById('usageClusters').disabled = true;
+          document.getElementById('passingClusters').disabled = true;
 
           for (count = 0; count < numPossesions; count++) {
             var path = findPath();
@@ -242,6 +244,8 @@
           }
           setTimeout(function () {
             document.getElementById('simulateButton').disabled = false;
+            document.getElementById('usageClusters').disabled = false;
+            document.getElementById('passingClusters').disabled = false;
           }, 5000);
         }
 
@@ -264,15 +268,14 @@
           var url = '/_get_pass_clusters?team=' + team + '&type=' + type;
           d3.json(url, function(cluster_data) {
             assignments = cluster_data['clusters'];
-            console.log(cluster_data);
             graph.nodes.forEach(function (n, i) {
               if (i < assignments.length) {
                 n.group = assignments[i] + 2;
-                console.log(n.group);
               }
               else {
                 n.group = 0;
               }
+              visibleLinks = [];
               restart();
             });
           });

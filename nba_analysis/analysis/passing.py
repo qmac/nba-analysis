@@ -2,7 +2,7 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.readwrite import json_graph
-from sklearn.cluster import AffinityPropagation, AgglomerativeClustering
+from sklearn.cluster import AffinityPropagation, SpectralClustering
 
 import sys
 
@@ -57,8 +57,7 @@ def get_passing_clusters(df, team):
     mat = nx.adjacency_matrix(g, nodelist=None, weight='label')
     mat = 1 - mat.todense()
 
-    clstr = AgglomerativeClustering(n_clusters=3, affinity='precomputed',
-                                    linkage='complete')
+    clstr = SpectralClustering(n_clusters=3, affinity='precomputed')
     res = clstr.fit(mat)
 
     return res.labels_
