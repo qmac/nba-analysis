@@ -19,7 +19,18 @@ def clusters_to_json(player_clusters):
 
     players_dict = {}
     players_dict['name'] = 'vis'
-    players_dict['children'] = map(lambda x: {'name':TIER_NAMES[int(tiers_dict[int(x[0])])], 'children':map(lambda x:{'name':x, 'size':SIZE}, x[1]['name'])}, players_grouped)
+    children = []
+    for tier_num, tier in players_grouped:
+        players = map(lambda x: {
+            'name': x[1]['name'],
+            'id': x[1]['id'],
+            'size': SIZE
+        }, tier.iterrows())
+        children.append({
+            'name': TIER_NAMES[int(tiers_dict[int(tier_num)])],
+            'children': players
+        })
+    players_dict['children'] = children
     return players_dict
 
 
@@ -31,6 +42,7 @@ def cluster(df, year, algorithm='KMeans'):
 
     # Set up fitting data
     names = df['PLAYER_NAME']
+    ids = df['PLAYER_ID'].astype(str)
     df = df[FEATURE_COLUMNS]
     df = (df - df.min()) / (df.max() - df.min())
 
@@ -44,6 +56,7 @@ def cluster(df, year, algorithm='KMeans'):
     # Convert results to JSON for frontend
     df['tier'] = clstr.labels_
     df['name'] = names
+    df['id'] = ids
     return clusters_to_json(df)
 
 

@@ -1,4 +1,5 @@
 import sys
+import urllib
 
 from tqdm import tqdm
 from nba_analysis.scraping import scrape_synergy, write_to_data_source
@@ -7,11 +8,19 @@ from nba_analysis.scraping import scrape_synergy, write_to_data_source
 def scrape_playtypes(play_types):
     player_dicts = {}
     for play_type in tqdm(play_types):
-        url = 'http://stats-prod.nba.com/wp-json/statscms/v1/synergy/player/?category=%s&limit=500&names=offensive&q=2475619&season=2016&seasonType=Reg' % play_type
+        params = urllib.urlencode({
+            'category': play_type,
+            'limit': 500,
+            'names': 'offensive',
+            'season': '2016',
+            'seasonType': 'Reg'
+        })
+        url = 'http://stats-prod.nba.com/wp-json/statscms/v1/synergy/player/?%s' % params
         players = scrape_synergy(url)
 
         for player in players:
-            if isinstance(player['PlayerLastName'], (int, long)):
+            if isinstance(player['PlayerLastName'], (int, long)) or \
+               not isinstance(player['PlayerIDSID'], (int, long)):
                 continue
             name = '%s %s' % (player['PlayerFirstName'], player['PlayerLastName'])
             player_dict = {} if name not in player_dicts else player_dicts[name]
